@@ -1,0 +1,173 @@
+{% if item|length > 0 %}
+	<ul>
+	{% for children in item %}
+		{% if children.rooms.id == room.id %}
+			{% if children.value == 'Y' %}
+				{% if children.plan.type == 'caption' %}
+					<li class="caption">
+						<h3>{{children.plan.name}}</h3>
+						{% include 'Top10CabinetBundle:Plan:showproperties_post.html.twig' with { 'item' : children.children } %}
+					</li>
+				{% endif %}
+
+				{% if children.plan.type == 'checkbox' or children.plan.type == 'tree' %}
+					<li {% if children.parent|length > 0 and children.parent.plan.type != 'caption' %}style="display:none"{% endif %}>
+						<div class="branch panel panel-default">
+							<div class="panel-heading
+									{% if (children.plan.type == 'tree' and children.children|length == children.countfinished) or (children.finished == 'Y' and children.plan.type == 'checkbox') %}
+										finished-heading
+									{% endif %}"
+							>
+								<div class="row">
+									<div class="col-xs-1">
+										{% if children.children|length > 0 %}
+											<span class="glyphicon glyphicon-plus toggle_branch"></span>
+										{% endif %}
+										{% if children.plan.type == 'checkbox' %}
+											<input 
+												type="checkbox" 
+												id="{{'item_' ~ children.plan.code}}" 
+												class="item"
+												name="plan[{{ children.id }}]"
+												value="Y"
+												{% if post is defined and children.posts == post %}checked="checked"{% endif %} 
+											/>
+										{% endif %}
+									</div>
+									<div class="col-xs-5">
+										<div class="row">
+											<span>{{ children.plan.name }}</span>
+											{% if children.children|length > 0 %}
+												<span class="badge pull-right metadata" title="Количество выбранных работ {{ children.children|length }} в категории {{ children.plan.name }} ">
+													{{ children.children|length }}
+												</span>
+											{% endif %}
+
+											{% if children.plan.type == 'checkbox' and children.name != null %}
+												/<em>
+													{% if  children.link != null %} <a href="{{ children.link }}" target="_blanck">{% endif %}
+														{{ children.name }}
+													{% if  children.link != null %} </a>{% endif %}
+												</em>
+											{% endif %}
+										</div>
+									</div>
+									<div class="col-xs-6 metadatas">
+										{% if children.children|length > 0 %}
+											{% if children.countfinished > 0 %}
+												<span class="metadata finished" title="Колличество выполненых работ">
+													<span class="glyphicon glyphicon-ok"></span>{{ children.countfinished }}
+												</span>&nbsp;
+											{% endif %}
+
+											{% if children.daystobeginchild > 0 %}
+												<span 
+													class="metadata"
+													style="color:#428bca"
+													title='В категории "{{ children.plan.name }}" ближайшая работа начнется через {{children.daystobeginchild}} дня'
+												>
+													<span class="glyphicon glyphicon-calendar"></span>+{{children.daystobeginchild}}
+												</span>
+											{% endif %}
+
+											{% if children.daystobeginchild <= 0 and children.daystobeginchild is not null and children.daystoendchild >= 0 and children.daystoendchild is not null %}
+												<span 
+													class="metadata"
+													style="color:#f0ad4e;"
+													title='В категории "{{ children.plan.name }}" на сегодня заплонированны работы по ремонту и продляться еще {{children.daystoendchild}} дня'
+												>
+													<span class="glyphicon glyphicon-calendar"></span> в роцессе
+												</span>&nbsp;
+											{% endif %}
+
+											{% if children.daystoendchild < 0 %}
+												<span 
+													class="metadata"
+													style="color:#d9534f;"
+													title='В категории "{{ children.plan.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+												>
+													<span class="glyphicon glyphicon-calendar"></span>{{ children.daystoendchild }}
+												</span>&nbsp;
+											{% endif %}
+
+											{% if children.dayworckchild is not null %}
+												<span class="metadata" title="Общее время на работу {{children.dayworckchild}} дня">
+													<span class="glyphicon glyphicon-time"></span>{{children.dayworckchild}}
+												</span>&nbsp;
+											{% endif %}
+
+											{% set sum = children.sumprice + children.sumpricefinished %}
+											{% if sum > 0 %}
+												<span class="metadata" title="Общая сумма {{ sum }} руб.">
+													<span class="glyphicon glyphicon-rub" ></span>{{ sum }}
+												</span>&nbsp;
+											{% endif %}
+										{% endif %}
+
+										{#--------------------------------Рассчет времени пункта плана-----------------------------------------#}
+										{% if children.plan.type == 'checkbox' %}
+											{% if children.finished != 'Y' %}
+												{% if children.daystobegin > 0 %}
+													<span 
+														class="metadata"
+														style="color:#428bca"
+														title='В категории "{{ children.plan.name }}" Работа начнется через {{children.daystobegin}} дня'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>+{{children.daystobegin}}
+													</span>&nbsp;
+												{% endif %}
+												{% if children.daystobegin <= 0 and children.daystobegin is not null and children.daystoend >= 0 and children.daystoend is not null %}
+													<span 
+														class="metadata"
+														style="color:#f0ad4e;"
+														title='В категории "{{ children.plan.name }}" на сегодня заплонированны работы по ремонту и продляться еще {{children.daystoend}} дня'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>в роцессе
+													</span>&nbsp;
+												{% endif %}
+												{% if children.daystoend < 0 %}
+													<span 
+														class="metadata"
+														style="color:#d9534f;"
+														title='В категории "{{ children.plan.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>{{ children.daystoend }}
+													</span>&nbsp;
+												{% endif %}
+											{% endif %}
+										{% endif %}
+										{#--------------------------------/Рассчет времени пункта плана-----------------------------------------#}
+
+										{% if children.quantity >0 and ( children.price >0 or children.price >0 ) %}
+											{% set sum =  children.quantity * (children.price + children.priceworck) %}
+											<span class="metadata" title="Утвержденная сумма {{ sum }} руб.">
+												<span class="glyphicon glyphicon-rub" ></span> {{ sum }}
+											</span>&nbsp;
+										{% endif %}
+
+										{% if children.plan.type == 'checkbox' %}
+											<label for="form_description" class="control-label">Закончен</label>
+											<input 
+												type="checkbox" 
+												id="{{'item_' ~ children.plan.code}}" 
+												class="finished"
+												name="finished[{{ children.id }}]"
+												value="Y"
+												{% if children.finished == 'Y' %}checked="checked"{% endif %}
+												{% if post is defined and children.posts == post %}{% else %}disabled="disabled"{% endif %} 
+											/>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{% include 'Top10CabinetBundle:Plan:showproperties_post.html.twig' with { 'item' : children.children } %}
+
+					</li>
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	</ul>
+{% endif %}

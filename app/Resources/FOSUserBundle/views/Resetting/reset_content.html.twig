@@ -1,0 +1,24 @@
+<form class="ym-form" action="{{ path('fos_user_resetting_reset', {'token': token}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_resetting_reset">
+    
+    {{ form_errors(form) }}
+    
+    <div class="ym-fbox-text">
+		{{ form_label(form.new.first) }}
+		{{ form_errors(form.new.first) }}
+		{{ form_widget(form.new.first) }}
+	</div>
+    
+    <div class="ym-fbox-text">
+		{{ form_label(form.new.second) }}
+		{{ form_errors(form.new.second) }}
+		{{ form_widget(form.new.second) }}
+	</div>
+    
+    {{ form_rest(form) }}
+    
+    {#{ form_widget(form) }#}
+    
+    <div class="ym-fbox-button">
+        <input class="ym-button" type="submit" value="{{ 'resetting.reset.submit'|trans({}, 'FOSUserBundle') }}" />
+    </div>
+ </form>

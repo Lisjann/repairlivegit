@@ -1,0 +1,603 @@
+{% extends '::basenoright.html.twig' %} 
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Редактирование дома{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+{#% block jquery %}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/lib/jquery-1.8.3.min.js') }}"></script>
+{% endblock %#}
+
+{% block javascript %}
+{# TinyMCE #}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/tinymce/js/tinymce/tinymce.js') }}"></script>
+	<script type="text/javascript">
+		tinymce.init({
+		  verify_html : false,
+		  selector: 'textarea#top10_cabinetbundle_room_preview',
+		  language:'ru',
+		  //width: 790,
+		  height: 500,
+		  //autoresize_min_height: 500,
+		  fixed_toolbar_container: '#mytoolbar',
+		  plugins: [
+			"autoresize advlist stylebuttons autolink  autosave lists charmap pagebreak spellchecker",
+			"searchreplace visualblocks wordcount fullscreen insertdatetime nonbreaking",
+			"directionality emoticons template paste colorpicker textpattern code link"
+		  ],
+
+		  toolbar1: "bold italic underline strikethrough | style-p style-h2 | link unlink | {% if is_granted('ROLE_ADMIN') %}visualblocks code{% endif %}",
+
+		  menubar: false,
+		  toolbar_items_size: 'medium',
+		  visualblocks_default_state: true,
+
+		  style_formats: [{
+			title: 'Bold text',
+			inline: 'b'
+		  }, {
+			title: 'Red text',
+			inline: 'span',
+			styles: {
+			  color: '#ff0000'
+			}
+		  }, {
+			title: 'Red header',
+			block: 'h1',
+			styles: {
+			  color: '#ff0000'
+			}
+		  }, {
+			title: 'Example 1',
+			inline: 'span',
+			classes: 'example1'
+		  }, {
+			title: 'Example 2',
+			inline: 'span',
+			classes: 'example2'
+		  }, {
+			title: 'Table styles'
+		  }, {
+			title: 'Table row 1',
+			selector: 'tr',
+			classes: 'tablerow1'
+		  }],
+
+		  templates: [{
+			title: 'Test template 1',
+			content: 'Test 1'
+		  }, {
+			title: 'Test template 2',
+			content: 'Test 2'
+		  }],
+		  content_css: [
+			'{{ asset("bundles/cabinet/tinymce/js/tinymce/skins/lightgray/content.home.min.css") }}',
+			'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+			'//www.tinymce.com/css/codepen.min.css'
+		  ]
+		});
+	</script>
+
+
+	{% include 'Top10CabinetBundle:Home:fineuploader.html.twig' %}
+
+{% endblock %}
+
+
+{% block body %}
+	<div class="col-xs-12 center_content">
+		<div class="xs-row">
+			{% if room.id is defined %}
+				{% set url = path('room_edit', { 'id':room.id })  %}
+				{% set returnRoom = '<a class="btn btn-default" href="' ~ path('room_show', { 'id':room.id, 'code':room.code }) ~ '">Отмена</a>' %}
+			{% else %}
+				{% set url = path('room_add', { 'home_id':home_id }) %}
+				{% set returnRoom = null %}
+				
+			{% endif %}
+
+			<div class="block-border">
+				<div class="col-lg-12">
+					<form action="{{url}}" method="POST" role="form" {{ form_enctype(roomForm) }}>
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<label class="control-label" for="top10_cabinetbundle_room_characteristics">Картинки для слайдера</label>
+							<span class="help-block">
+								Эти картинки будут отбражаться в слайдере на странице этой комнаты.<br/>Рекомендуемое разрешение картинку 1200х700 пикселей, если картинка будет больше то ее края обрежутся до этого разрешения
+							</span>
+							<div id="fine-uploader-gallery"></div>
+						</div>
+
+						<div class="form-group {% if form_errors(roomForm.name) %}has-error{% endif %}">
+							{{ form_label(roomForm.name, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(roomForm.name, { 'attr': {'class':'form-control inputname'} }) }}
+							{% if form_errors(roomForm.name) %}
+								<div class="help-block alert alert-danger">{{ form_errors(roomForm.name) }}</div>
+							{% endif %}
+							<span class="help-block">Придумайте оригинальное название, так чтобы оно в картце характеризовала эту комнату, или же назовите её красивым именем.</span>
+						</div>
+
+						{% if is_granted('ROLE_ADMIN') %}
+							<div class="form-group {% if form_errors(roomForm.created) %}has-error{% endif %}">
+								{{ form_label(roomForm.created, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(roomForm.created, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(roomForm.created) %}
+									<div class="help-block alert alert-danger">{{ form_errors(roomForm.created) }}</div>
+								{% endif %}
+							</div>
+
+							{{ form_widget(roomForm.code, { 'attr': {'class':'form-control'} }) }}
+
+							<div class="form-group {% if form_errors(roomForm.keywords) %}has-error{% endif %}">
+								{{ form_label(roomForm.keywords, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(roomForm.keywords, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(roomForm.keywords) %}
+									<div class="help-block alert alert-danger">{{ form_errors(roomForm.keywords) }}</div>
+								{% endif %}
+							</div>
+
+							<div class="form-group {% if form_errors(roomForm.description) %}has-error{% endif %}">
+								{{ form_label(roomForm.description, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(roomForm.description, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(roomForm.description) %}
+									<div class="help-block alert alert-danger">{{ form_errors(roomForm.description) }}</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<div class="form-group {% if form_errors(roomForm.preview) %}has-error{% endif %}">
+							{{ form_label(roomForm.preview, null, {'label_attr': {'class': 'control-label'}}) }}
+							<div class="help-block">Думаем вам есть что рассказать об этой комнате, и вам не составит труда написать о ней более чем на 140 символов.<br/>Рекомендуем не писать сплошные длинные тексты, а разделять их на параграфы по 3-5 строк.</div>
+							{{ form_widget(roomForm.preview, { 'attr': { 'class':'control-label editor'} }) }}
+							{% if form_errors(roomForm.preview) %}
+								<div class="help-block alert alert-danger">{{ form_errors(roomForm.preview) }}</div>
+							{% endif %}
+						</div>
+
+						{#----------Свойства комнаты Самопальная форма----------------#}
+						<div class="panel panel-default">
+						  <div class="panel-heading">Характеристики</div>
+							<div class="panel-body properties form-horizontal">
+								<div class="form-group {% if form_errors(roomForm.roomstypeint) %}has-error{% endif %}">
+									{{ form_label(roomForm.roomstypeint, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+									<div class="col-sm-9">
+										{{ form_widget(roomForm.roomstypeint, { 'attr': {'class':'form-control'} }) }}
+										{% if form_errors(roomForm.roomstypeint) %}
+											<div class="help-block alert alert-danger">{{ form_errors(roomForm.roomstypeint) }}</div>
+										{% endif %}
+									</div>
+								</div>
+
+								{% for propertie in properties %}
+									{% set val = null %}
+									{% if room.id is defined %}
+										{% for propertiesforegin in room.propertiesforegin %}
+											{% if propertiesforegin.properties.id == propertie.id %}
+												{% set val = propertiesforegin.value %}
+											{% endif %}
+										{% endfor %}
+									{% endif %}
+
+									{% if propertie.type == 'number' or propertie.type == 'text'%}
+										<div class="form-group">
+											<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+											<div class="col-sm-9">
+												<input type="{{propertie.type}}" id="{{'properties_' ~ propertie.code}}" value="{{ val }}" name="properties[{{ propertie.id }}]" class="form-control"/>
+											{{propertie.measure}}
+											</div>
+										</div>
+									{% endif %}
+
+									{% if propertie.type == 'checkbox' %}
+										<div class="form-group">
+											<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+											<div class="col-sm-9">
+												<input 
+													type="{{propertie.type}}" 
+													id="{{'propertie_' ~ propertie.code}}" 
+													name="properties[{{propertie.id}}]" 
+													value="Есть"
+													{% if val == 'Есть' %}checked="checked"{% endif %} 
+												/>
+											</div>
+										</div>
+									{% endif %}
+
+									{% if propertie.type == 'choices' %}
+										{% if propertie.propertiestypelist %}
+											<div class="form-group">
+												<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+												<div class="col-sm-9">
+													<select id="{{'propertie_' ~ propertie.code}}" name="properties[{{propertie.id}}]" class="form-control">
+														{% for propertiestypelist in propertie.propertiestypelist %}
+															<option value="{{propertiestypelist.value}}" {% if propertiestypelist.value == val %}selected="selected"{% endif %} >{{propertiestypelist.value}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										{% endif %}
+									{% endif %}
+								{% endfor %}
+							</div>
+						</div>
+						{#----------/Свойства комнаты Самопальная форма---------------- #}
+
+						{% if is_granted('ROLE_ADMIN') %}
+							<div class="form-group {% if form_errors(roomForm.characteristics) %}has-error{% endif %}">
+								{{ form_label(roomForm.characteristics, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(roomForm.characteristics, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(roomForm.characteristics) %}
+									<div class="help-block alert alert-danger">{{ form_errors(roomForm.characteristics) }}</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<a name="layout"></a>
+							<label class="control-label" for="top10_cabinetbundle_room_characteristics">Планировка, обмерочный план</label>
+							<span class="help-block">
+								<strong>Заполняет заказчик.</strong>. Разместите сюда картинки с планировкой комнаты со всеми имеющимися недвижимыми предметами(батареи, трубы, подоконники, вент каналы), в планеровке укажите как можно больше замеров в том числе и недвижемых предметов. 
+							</span>
+							<div id="fine-uploader-gallery-layout" class="fine-uploader-gallery"></div>
+						</div>
+
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<a name="collage"></a>
+							<label class="control-label" for="top10_cabinetbundle_room_characteristics">Каллаж, набросок картинок материалов и мебели</label>
+							<span class="help-block">
+								<strong>Заполняет дизайнер.</strong>. Каллажи формируется очень быстро по нескольо вариантов. Нужен для того чтобы быстро понять что хочет заказчик. 
+							</span>
+							<div id="fine-uploader-gallery-collage" class="fine-uploader-gallery"></div>
+						</div>
+
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<a name="reamingwalls"></a>
+							<label class="control-label" for="top10_cabinetbundle_room_characteristics">Развертка стен</label>
+							<span class="help-block">
+								<strong>Заполняет дизайнер</strong>. Если вы не хотите делать 3d-визуализацию или если нужен более четкое понятие совместимости форм и материалов. Так же более подробную деталировку вы можете указать в разделе <a target="_blanck" href="{{ path( 'plan_add', { 'room_id':room.id }) }}">План-проект</a>
+							</span>
+							<div id="fine-uploader-gallery-reamingwalls" class="fine-uploader-gallery"></div>
+						</div>
+
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<a name="threedmodel"></a>
+							<label class="control-label" for="top10_cabinetbundle_room_characteristics">3d-визуализация</label>
+							<span class="help-block">
+								<strong>Заполняет дизайнер</strong>. Загрузите сюда 3-4 ракурса из 3d-модели
+							</span>
+							<div id="fine-uploader-gallery-threedmodel" class="fine-uploader-gallery"></div>
+						</div>
+
+						<div class="form-group">
+							{{ form_widget(roomForm.approved) }} {{ form_label(roomForm.approved, null, {'label_attr': {'class': 'control-label'}}) }}
+						</div>
+
+						{# form_widget(roomForm, {'attr': {'class': 'form-group'}}) #}
+						{# form_errors(roomForm) #}
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-danger">Сохранить</button>
+							{{ returnRoom| raw }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}
+	 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
+    ====================================================================== -->
+    <script type="text/javascript">
+        var uploader = $('#fine-uploader-gallery').fineUploader({
+            debug: true, //включаем дебаг в консоль браузера. 
+			{% if room.id is defined %}
+			session : {
+				endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}",
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+            request: {
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}",
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+            thumbnails: {
+                placeholders: {
+                    waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+                    notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+                }
+            },
+			
+            resume: {
+                enabled: true
+			},
+			deleteFile: {
+                enabled: true,
+                method: "POST",
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+				{% endif %}
+            },
+			validation: {
+                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+            },
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+
+
+		//для загрузки калложа
+		var uploader = $('#fine-uploader-gallery-layout').fineUploader({
+			debug: true, //включаем дебаг в консоль браузера. 
+			{% if room.id is defined %}
+			session : {
+				endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}?type=layout",
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+			request: {
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}?type=layout",
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}?type=layout",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+			thumbnails: {
+				placeholders: {
+					waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+					notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+				}
+			},
+			
+			resume: {
+				enabled: true
+			},
+			deleteFile: {
+				enabled: true,
+				method: "POST",
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+				{% endif %}
+			},
+			validation: {
+				allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+			},
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+		});
+
+
+		//для загрузки планировки
+		var uploader = $('#fine-uploader-gallery-collage').fineUploader({
+			debug: true, //включаем дебаг в консоль браузера. 
+			{% if room.id is defined %}
+			session : {
+				endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}?type=collage",
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+			request: {
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}?type=collage",
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}?type=collage",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+			thumbnails: {
+				placeholders: {
+					waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+					notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+				}
+			},
+			
+			resume: {
+				enabled: true
+			},
+			deleteFile: {
+				enabled: true,
+				method: "POST",
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+				{% endif %}
+			},
+			validation: {
+				allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+			},
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+
+		//для загрузки развертки стен
+		var uploader = $('#fine-uploader-gallery-reamingwalls').fineUploader({
+			debug: true, //включаем дебаг в консоль браузера. 
+			{% if room.id is defined %}
+			session : {
+				endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}?type=reamingwalls",
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+			request: {
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}?type=reamingwalls",
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}?type=reamingwalls",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+			thumbnails: {
+				placeholders: {
+					waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+					notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+				}
+			},
+			
+			resume: {
+				enabled: true
+			},
+			deleteFile: {
+				enabled: true,
+				method: "POST",
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+				{% endif %}
+			},
+			validation: {
+				allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+			},
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+
+		//для загрузки развертки стен
+		var uploader = $('#fine-uploader-gallery-threedmodel').fineUploader({
+			debug: true, //включаем дебаг в консоль браузера. 
+			{% if room.id is defined %}
+			session : {
+				endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}?type=threedmodel",
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+			request: {
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}?type=threedmodel",
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}?type=threedmodel",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+			thumbnails: {
+				placeholders: {
+					waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+					notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+				}
+			},
+			
+			resume: {
+				enabled: true
+			},
+			deleteFile: {
+				enabled: true,
+				method: "POST",
+				{% if room.id is defined %}
+					endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+				{% endif %}
+			},
+			validation: {
+				allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+			},
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+    </script>
+{% endblock javascriptSlide %}

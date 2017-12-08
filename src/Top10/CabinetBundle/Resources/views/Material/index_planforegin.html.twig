@@ -1,0 +1,43 @@
+{% extends '::baseajax.html.twig' %} 
+
+{% block title %}Материалы{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+	$(function () {
+		$('.tree li:has(ul)').addClass('parent_li').find(' > .toggle_branch').attr('title', 'Свернуть ');
+
+		$('.tree li.parent_li > .branch .toggle_branch').on('click', function (e) {
+			var children = $(this).closest('li.parent_li').find(' > ul > li');
+			if (children.is(":visible")) {
+				children.hide('fast');
+				$(this).attr('title', 'Развернуть').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+			} else {
+				children.show('fast');
+				$(this).attr('title', 'Свернуть').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+			}
+			e.stopPropagation();
+		});
+
+		$('.metadata, .plan .badge').tooltip();
+		$('.question').popover();
+
+	});
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+	<div class="col-xs-12 center_content modallist">
+		<div class="block-border plan">
+			<div class="col-lg-12">
+					{#----------Материалы Самопальная форма----------------#}
+					<div class="tree">
+						{% include 'Top10CabinetBundle:Material:list_planforegin.html.twig' with { 'item' : material } %}
+					</div>
+					{#----------/Материалы Самопальная форма----------------#}
+			</div>
+		</div>
+	</div>
+{% endblock body %}

@@ -1,0 +1,46 @@
+<div class="block-border">
+	<div class="col-xs-4">
+		{% if user.avatar %}
+			<img src="{{ user.avatar }}" class="author_portrait img-responsive" alt=""/>
+		{% else %}
+			<div class="author_portrait">{{ user|slice(0, 2)|upper }}</div>
+		{% endif %}
+	</div>
+	<div class="col-xs-8">
+		<h1>{{ user }}</h1>
+		
+		<table class="meta">
+			<tr>
+				<td class="date"><time>{{user.created|date('d.m.Y')}}</time></td>
+				<td>{{user.location}}</td>
+			</tr>
+		</table>
+		<p class="preview">{{user.message | raw}}</p>
+	</div>
+	{% if app.security.getToken().getUser() != 'anon.' and app.security.getToken().getUser() == user %}
+		<div class="col-xs-12">
+			<a class="btn_link icin_btn" href="{{ path('home_add') }}"><span class="glyphicon glyphicon-plus"></span> Добавить Дом</a>
+			<a class="btn_link icin_btn" href="{{ path('fos_user_profile_edit') }}"><span class="glyphicon glyphicon-pencil"></span>  Редактировать профиль</a>
+			<a class="btn_link icin_btn" href="{{ path('fos_user_security_logout') }}"><span class="glyphicon glyphicon-log-out"></span> {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</a>
+		</div>
+	{% endif %}
+</div>
+
+{% if user.content %}
+<div class="post block-border">
+	<div class="col-xs-12">
+		{{ user.content | raw }}
+	</div>
+</div>
+{% endif %}
+
+<div itemscope itemtype="http://schema.org/Organization">
+	<meta itemprop="name" content="РемонтLive">  
+	<div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+		<meta itemprop="postalCode" content="624000">
+		<meta itemprop="addressLocality" content="{# user.location #}">
+	</div>
+	<meta itemprop="email" content="{{ user.email }}">
+</div>
+
+    

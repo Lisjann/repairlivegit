@@ -1,0 +1,14 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block left_content %}
+	{% include 'FOSUserBundle:Profile:leftcontent.html.twig' with { 'homesRoomsMenu' : homesRoomsMenu } %}
+{% endblock left_content %}
+
+{% block fos_user_content %}
+	{% include "FOSUserBundle:Profile:edit_content.html.twig" %}
+{% endblock fos_user_content %}
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}

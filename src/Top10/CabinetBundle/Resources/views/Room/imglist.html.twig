@@ -1,0 +1,89 @@
+
+<div class="tab-pane room" id="{{ anchor }}">
+	<div class="block-border">
+
+		<div class="col-sm-8">
+			<a name="{{ anchor }}"></a>
+			<h2>{{ caption }}</h2>
+		</div>
+		<div class="col-sm-4">
+			{% if isWriter %}
+				<a class="btn_link icin_btn atcaption" href="{{ path('room_edit', { 'id':room.id }) }}#{{ anchor }}"><span class="glyphicon glyphicon-pencil"></span> Изменить</a>
+			{% endif %}
+		</div>
+
+		<div class="col-xs-12 col-md-12">
+			<div class="alert alert-info">
+					{% if anchor == 'layout' %}
+						<strong>Заполняет заказчик</strong>.Разместите сюда картинки с планировкой комнаты со всеми имеющимися недвижимыми предметами(батареи, трубы, подоконники, вент каналы), в планеровке укажите как можно больше замеров в том числе и недвижемых предметов. 
+					{% elseif anchor == 'collage' %}
+						<strong>Заполняет дизайнер</strong>. Каллажи формируется очень быстро по нескольо вариантов. Нужен для того чтобы быстро понять что хочет заказчик. 
+					{% elseif anchor == 'reamingwalls' %}
+						<strong>Заполняет дизайнер</strong>. Если вы не хотите делать 3d-визуализацию или если нужен более четкое понятие совместимости форм и материалов. Так же более подробную деталировку вы можете указать в разделе <a target="_blanck" href="{{ path( 'plan_add', { 'room_id':room.id }) }}">План-проект</a>
+					{% elseif anchor == 'threedmodel' %}
+						<strong>Заполняет дизайнер</strong>. Загрузите сюда 3-4 ракурса из 3d-модели
+					{% else %}
+						Тут пока что ничего не заполнено.
+					{% endif %}
+			</div>
+		</div>
+
+		{% if anchor == 'layout' %}
+			<div class="col-xs-12 col-md-12">
+			<div class="panel-group" id="accordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<a class="panel-title anchor" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+							Инструкция по создания обмерочного плана
+						</a>
+					</div>
+					<div id="collapseOne" class="panel-collapse collapse">
+						<div class="panel-body">
+							<p>
+								<a target="_blanck" href="https://rozetkaonline.ru/poleznie-stati-o-rozetkah-i-vikluchateliah/item/59-obmerochnyj-plan-kvartiry">
+									Статья как составить обмерочный план квартиры
+								</a>
+							</p>
+
+							<p>Загрузите чертеж комнаты из плана БТИ</p>
+							<p>Вид сверху Нарисуйте на листе бумаги не менее формата А5 от руки периметр комнаты На плане должно быть указано: двери, окна, проемы, люки, выступы, углы, короба. За пример можете взять план БТИ.</p>
+
+							<ol>
+							<li>Замер сплошных стен без проемов, дверей, окон, выступов от угла до угла стены;</li>
+							<li>Замер стен с вырезами (проемами, дверями, окнами и.т.д) от угла стены до выреза с двух сторон стены. Если вырезов в стене несколько, то сделайте замер стены между вырезами;</li>
+							<li>Замер самих вырезов в стене (проемы, двери, окна и.т.д);</li>
+							<li>Замер стен с нишами, выступами, углами, вент каналами</li>
+							<li>Укажите на плане статические объекты (батареи, радиаторы, трубы, полотенцесушители, люки, балки, колонны, подоконники, розетки, светильники и.т.д)</li>
+							<li>Как и с вырезами в стене сделайте замер от ближайшего угла стены до объекта. Если обекты находятся не на стене, до укажите растояние их до ближайшей стены</li>
+							<li>Сделайте замер самих объектов.</li>
+							<li>Укажите состав стен</li>
+							</ol>
+
+							<p>Вид сбоку Нарисуйте на листе бумаги не менее формата А5 от руки развертку стен с дверями, окнами проемами, люками,  выступами, углами, коробами.</p>
+							<p>Замер производиться по аналогии с видом сверху, но еще указывается замеры высоты потолка, замеры стен с вырезами от пола до выреза, от потолка до выреза, замер самого выреза. Аналогично вырезам провести замеры с статичными объектами.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		{% endif %}
+
+		{% if imgs | length > 0 %}
+			{% for slide in imgs %}
+				<div class="col-xs-12 col-md-6 layout">
+					<div class="xs-row-left-right">
+						<a  href="{{ slide.image }}"
+							data-toggle="lightbox" 
+							data-gallery="{{ anchor }}-gallery"
+							data-width="1000"
+							data-title='{% if  slide.description != null %}{{ slide.description }}{% endif %}'
+							class="metadata"
+						>
+							<img src="{{ slide.image }}" class="author_portrait img-responsive" alt=""/>
+						</a>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+	</div>
+</div>

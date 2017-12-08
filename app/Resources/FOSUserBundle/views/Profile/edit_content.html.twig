@@ -1,0 +1,276 @@
+{% block javascript %}
+{# TinyMCE #}
+<script type="text/javascript" src="{{ asset('bundles/cabinet/tinymce/js/tinymce/tinymce.js') }}"></script>
+{% if is_granted('ROLE_ADMIN') %}
+	<script type="text/javascript">
+	tinymce.init({
+	  verify_html : false,
+	  selector: 'textarea#fos_user_profile_form_content',
+	  language:'ru',
+	  //width: 790,
+	  height: 500,
+	  //autoresize_min_height: 500,
+	  fixed_toolbar_container: '#mytoolbar',
+	  plugins: [
+		"fixedtoolbar autoresize advlist stylebuttons autolink autosave cite link imagedesc lists charmap preview hr pagebreak spellchecker",
+		"searchreplace wordcount visualblocks code fullscreen insertdatetime media",
+		"table contextmenu directionality emoticons textcolor paste textcolor colorpicker textpattern"
+	  ],
+
+	  toolbar1: "bold italic | style-p style-h2 | {% if is_granted('ROLE_ADMIN') %}cite blockquote q |{% endif %} bullist numlist | link unlink | image media | underline strikethrough superscript charmap | visualblocks {% if is_granted('ROLE_ADMIN') %}code{% endif %}",
+
+	  menubar: false,
+	  toolbar_items_size: 'medium',
+	  visualblocks_default_state: true,
+
+	  style_formats: [{
+		title: 'Bold text',
+		inline: 'b'
+	  },{
+		title: 'Example 1',
+		inline: 'span',
+		classes: 'example1'
+	  }, {
+		title: 'Example 2',
+		inline: 'span',
+		classes: 'example2'
+	  }, {
+		title: 'Table styles'
+	  }, {
+		title: 'Table row 1',
+		selector: 'tr',
+		classes: 'tablerow1'
+	  }],
+
+	  templates: [{
+		title: 'Test template 1',
+		content: 'Test 1'
+	  }, {
+		title: 'Test template 2',
+		content: 'Test 2'
+	  }],
+	  content_css: [
+		'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+		'{{ asset("bundles/cabinet/tinymce/js/tinymce/skins/lightgray/content.home.min.css") }}',
+		'//www.tinymce.com/css/codepen.min.css'
+	  ]
+	});
+	</script>
+{% endif %}
+
+
+	<!-- Fine Uploader Gallery CSS file
+    ====================================================================== -->
+    <link href="{{ asset('bundles/cabinet/fine-uploader/fine-uploader-new.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('bundles/cabinet/fine-uploader/fine-uploader-gallery-avatar.css') }}" rel="stylesheet"/>
+
+	<script src="{{ asset('bundles/cabinet/fine-uploader/jquery.fine-uploader-home-room.js') }}"></script>
+
+	 <!-- Fine Uploader Gallery template
+    ====================================================================== -->
+    <script type="text/template" id="qq-template-gallery">
+        <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="Для загрузки перенесите картинку в эту облость">
+            <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+            </div>
+            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+                <span class="qq-upload-drop-area-text-selector"></span>
+            </div>            
+            <span class="qq-drop-processing-selector qq-drop-processing">
+                <span>Процесс переноса изображения...</span>
+                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+            </span>
+            <div class="qq-upload-button-selector qq-upload-button">
+				<div class="qq-thumbnail-wrapper">+</div>
+				<div class="qq-file-name">
+					<span class="qq-upload-file-selector qq-upload-file">Добавить изображения</span>
+				 </div>
+			</div>
+			<ul class="qq-upload-list-selector qq-upload-list" role="region" aria-live="polite" aria-relevant="additions removals">
+                <li>
+                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+                    <div class="qq-progress-bar-container-selector qq-progress-bar-container">
+                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
+                    </div>
+                    <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+                    <div class="qq-thumbnail-wrapper">
+                        <img class="qq-thumbnail-selector" qq-max-size="235" qq-server-scale/>
+                    </div>
+                    <button type="button" class="qq-upload-cancel-selector qq-upload-cancel">X</button>
+                    <button type="button" class="qq-upload-retry-selector qq-upload-retry">
+                        <span class="qq-btn qq-retry-icon" aria-label="Retry"></span>
+                        Повторить
+                    </button>
+
+                    <div class="qq-file-info">
+                        <div class="qq-file-name">
+                            <span class="qq-upload-file-selector qq-upload-file"></span>
+                            <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
+                        </div>
+                        <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
+
+                        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">
+                            <span class="qq-btn qq-delete-icon" aria-label="Delete"></span>
+                        </button>
+                        <button type="button" class="qq-btn qq-upload-pause-selector qq-upload-pause">
+                            <span class="qq-btn qq-pause-icon" aria-label="Pause"></span>
+                        </button>
+                        <button type="button" class="qq-btn qq-upload-continue-selector qq-upload-continue">
+                            <span class="qq-btn qq-continue-icon" aria-label="Continue"></span>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+
+            <dialog class="qq-alert-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Закрыть</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-confirm-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Да</button>
+                    <button type="button" class="qq-ok-button-selector">Нет</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-prompt-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <input type="text">
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Отмена</button>
+                    <button type="button" class="qq-ok-button-selector">Ok</button>
+                </div>
+            </dialog>
+        </div>
+    </script>
+
+{% endblock javascript %}
+
+<div class="col-sm-9 col-xs-12 center_content">
+	<div class="xs-row">
+		<div class="block-border">
+			<div class="col-lg-12">
+				<form class="form-horizontal" role="form" action="{{ path('fos_user_profile_edit') }}" {{ form_enctype(form) }} method="POST" >
+					{# form_widget(form) #}
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Аватарка:</label>
+						<div class="col-sm-9">
+							<div id="fine-uploader-gallery"></div>
+						</div>
+					</div>
+					<div class="form-group">
+						{{ form_label(form.username, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+						<div class="col-sm-9">
+							{{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+							<span class="help-block">{{ form_errors(form.username) }}</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						{{ form_label(form.email, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+						<div class="col-sm-9">
+							{{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+							<span class="help-block">{{ form_errors(form.email) }}</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						{{ form_label(form.location, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+						<div class="col-sm-9">
+							{{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+							<span class="help-block">{{ form_errors(form.location) }}</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						{{ form_label(form.message, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+						<div class="col-sm-9">
+							{{ form_widget(form.message, {'attr': {'class': 'form-control', 'id':'form_preview', 'rows':'6'}}) }}
+							<span class="help-block">{{ form_errors(form.message) }}</span>
+						</div>
+					</div>
+
+					{#% if is_granted('ROLE_ADMIN') %}
+					<div class="form-group">
+						{{ form_label(form.content, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+						<div class="col-sm-9">
+							{{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+							<span class="help-block">{{ form_errors(form.content) }}</span>
+						</div>
+					</div>
+					{% endif #}
+
+					{{ form_rest(form) }}
+
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="submit" class="btn btn-danger">
+								Сохранить{# 'profile.edit.submit'|trans({}, 'FOSUserBundle') #}
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% block javascriptSlide %}
+	 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
+    ====================================================================== -->
+    <script type="text/javascript">
+        var uploader = $('#fine-uploader-gallery').fineUploader({
+            debug: true, //включаем дебаг в консоль браузера. 
+			session : {
+				endpoint : "{{ path( 'profile_uploadlist' ) }}",
+			},
+			template: 'qq-template-gallery',
+            request: {
+				endpoint: "{{ path( 'profile_upload' ) }}",
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+            thumbnails: {
+                placeholders: {
+                    waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+                    notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+                }
+            },
+			
+            resume: {
+                enabled: true
+			},
+			deleteFile: {
+                enabled: true,
+                method: "POST",
+				endpoint: "{{ path( 'profile_upload' ) }}"
+            },
+			validation: {
+                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 1 //максимальное количество файлов для текущего подключения плагина
+            },
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				tooManyItemsError: "Для аватарки достаточно одной картинки.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+    </script>
+{% endblock javascriptSlide %}

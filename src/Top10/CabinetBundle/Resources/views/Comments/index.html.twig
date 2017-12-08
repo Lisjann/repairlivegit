@@ -1,0 +1,128 @@
+{# src/top10/CabinetBundle/Resources/views/Comment/index.html.twig #}
+
+<script type="text/javascript">
+$(function() {
+	$('.likes_comment').click( function() {
+		var $likes_click = $(this);
+		$.ajax({
+			cache: false,
+			//url: '/app_dev.php/like/comments/' + $likes_click.attr("data-comment"),
+			url: '/like/comments/' + $likes_click.attr("data-comment"),
+			success: function(html){
+				$likes_click.find('.likes_count').html(html);
+				$likes_click.attr('class', 'likes_comment_disabled');
+			}
+		});
+	});
+});
+</script>
+
+{% for comment in comments %}
+
+	<tr>
+		<td class="comments_list_left">
+			<a name="{{ 'into' ~ comment.id }}"></a>
+			{% if comment.user %}
+				{% if comment.user.avatar %}
+					<a href="{{ path( 'fos_user_profile_show' ) }}" class="userpic big">
+						<img src="{{ comment.user.avatar()|imagine_filter('userpic') }}" alt=""/>
+					</a>
+				{% else %}
+					<div class="userpic big">{{ comment.user.username|slice(0, 2)|upper }}</div>
+				{% endif %}
+			{% else %}
+				<div class="userpic big">{{ comment.author|slice(0, 2)|upper }}</div>
+			{% endif %}
+		</td>
+		<td class="comments_list_right">
+			<article class="comment {{ cycle(['odd', 'even'], loop.index0) }}" id="comment-{{ comment.id }}">
+				<p>
+					<span class="author_name">
+						{% if comment.user %}
+							<a href="{{ path( 'fos_user_profile_show' ) }}">{{comment.user.username}}</a>
+						{% else %}
+							{{ comment.author }}
+						{% endif %}
+					</span>, 
+					<time datetime="{{ comment.created|date('c') }}">{{ comment.created|date('d.m.Y G:i') }}</time>
+				</p>
+				<p>{{ comment.content | raw }}</p>
+				<div class="comment_info">
+					<div class="response_click" data-parent="{{ comment.id }}">
+						<span>ответить</span>
+					</div>
+					{% if comment.likes|length == 0 %}
+						{% set class_likes_comment = 'likes_comment' %}
+					{% else %}
+						{% set class_likes_comment = 'likes_comment_disabled' %}
+					{% endif %}
+					<div class="{{ class_likes_comment }}" data-comment="{{ comment.id }}">
+						<div class="likes_icon">
+							<span class="glyphicon glyphicon-heart"></span>
+						</div>
+						<div class="likes_count">{% if comment.likescount|length > 0 %}{{ comment.likescount|length }}{% endif %}</div>
+						<div class="likes_text">лайк</div>
+					</div>
+				</div>
+				<div class="response_area"></div>
+			</article>
+
+			{% if comment.children|length > 0 %}
+				<table class="comments_list response">
+					{% for children in comment.children %}
+					<tr>
+						<td class="comments_list_left">
+							{% if children.user %}
+								{% if children.user.avatar %}
+									<a href="{{ path( 'fos_user_profile_show' ) }}" class="userpic mid">
+										<img src="{{ children.user.avatar()|imagine_filter('userpic') }}" alt=""/>
+									</a>
+								{% else %}
+									<div class="userpic mid">{{ children.user.username|slice(0, 2)|upper }}</div>
+								{% endif %}
+							{% else %}
+								<div class="userpic mid">{{ children.author|slice(0, 2)|upper }}</div>
+							{% endif %}
+						</td>
+						<td class="comments_list_right">
+							<article class="comment {{ cycle(['odd', 'even'], loop.index0) }}" id="comment-{{ children.id }}">
+								<p>
+									<span class="author_name">
+										{% if children.user %}
+											<a href="{{ path( 'fos_user_profile_show' ) }}">{{children.user.username}}</a>
+										{% else %}
+											{{ children.author }}
+										{% endif %}
+									</span>, 
+									<time datetime="{{ children.created|date('c') }}">{{ children.created|date('d.m.Y G:i') }}</time>
+								</p>
+								<p>{{ children.content | raw }}</p>
+
+								<div class="comment_info">
+									{% if children.likes|length == 0 %}
+										{% set class_likes_comment = 'likes_comment' %}
+									{% else %}
+										{% set class_likes_comment = 'likes_comment_disabled' %}
+									{% endif %}
+									<div class="{{ class_likes_comment }}" data-comment="{{ children.id }}">
+										<div class="likes_icon">❤</div>
+										<div class="likes_count">{% if children.likescount|length > 0 %}{{ children.likescount|length }}{% endif %}</div>
+										<div class="likes_text">лайк</div>
+									</div>
+								</div>
+
+							</article>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+			{% endif %}
+		</td>
+	</tr>
+{% else %}
+	<tr>
+		<td colspan="2">
+			<p>Этот пост пока никто не прокомментировал. Не хотите оставить первый комментарий?</p>
+		</td>
+	</tr>
+{% endfor %}

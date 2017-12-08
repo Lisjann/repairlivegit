@@ -1,0 +1,249 @@
+{% extends '::basenoright.html.twig' %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Создать план ремонта{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+
+{% block javascript %}
+
+<script type="text/javascript">
+	$(function () {
+		$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+			event.preventDefault();
+			$(this).ekkoLightbox({
+				alwaysShowClose: true
+			})
+		});
+
+		//------------вставляем новые выбранные из модального окна inputы для Материалов Плана-------------------/
+		$(document).on ( 'click', '#choose-material', function(){
+			$parent = $('input[name=material][type=radio]:checked');
+			$( 'input.parentint[type=hidden]' ).val( $parent.val() );
+
+			$('#parent_name').html( $parent.attr("material-name") );
+
+		});
+
+	});
+</script>
+{% endblock %}
+
+{% block body %}
+	<div class="col-xs-12 center_content">
+		<div class="xs-row">
+			
+			{% set url = path('material_edit', { 'id':null }) %}
+			{% set returnmaterial = null %}
+			{% set parentname = 'Назначить' %}
+			{% set notid = null %}
+
+			{% if material.id is defined %}
+				{% set url = path('material_edit', { 'id':material.id })  %}
+				{% set notid = '?notid=' ~ material.id %}
+
+				{% if material.parent.name is defined %}
+					{% set parentname = material.parent.name %}
+				{% endif %}
+				{#% set returnmaterial = '<a class="btn btn-default" href="' ~ path('material', { 'id':material.id, 'code':material.code }) ~ '">Отмена</a>' %#}
+			{% endif %}
+
+			<div class="block-border">
+				<div class="col-lg-12">
+					<form action="{{url}}" method="POST" role="form" {{ form_enctype(materialForm) }}>
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-xs-3">
+									{{ form_label(materialForm.parentint, null, {'label_attr': {'class': 'control-label'}}) }}:
+								</div>
+								<div class="col-xs-9">
+									<a
+										class="anchor" 
+										href="{{ path('material_parent') }}{{ notid }}"
+										data-toggle="lightbox" 
+										data-gallery="example-material"
+										data-width="600"
+										data-title='Выбирете Родительский пункт стройматериала'
+										data-footer='<button 
+													type="submit"
+													id="choose-material" 
+													class="btn btn-danger"
+													data-dismiss="modal"
+													aria-label="Close"
+												>
+													Выбрать
+												</button>'
+									>
+										<span id="parent_name">{{ parentname }}</span>
+									</a>
+									{{ form_widget(materialForm.parentint, { 'attr': {'class':'form-control parentint'} }) }}
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.name) %}has-error{% endif %}">
+							{{ form_label(materialForm.name, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.name, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(materialForm.name) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.name) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.code) %}has-error{% endif %}">
+							{{ form_label(materialForm.code, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.code, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(materialForm.code) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.code) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="row">
+							<div class="col-xs-10">
+								<div class="form-group {% if form_errors(materialForm.type) %}has-error{% endif %}">
+									{{ form_label(materialForm.type, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(materialForm.type, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(materialForm.type) %}
+										<div class="help-block alert alert-danger">{{ form_errors(materialForm.type) }}</div>
+									{% endif %}
+								</div>
+							</div>
+
+							<div class="col-xs-2">
+								<div class="form-group {% if form_errors(materialForm.sort) %}has-error{% endif %}">
+									{{ form_label(materialForm.sort, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(materialForm.sort, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(materialForm.sort) %}
+										<div class="help-block alert alert-danger">{{ form_errors(materialForm.sort) }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.image) %}has-error{% endif %}">
+							{{ form_label(materialForm.image, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.image, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(materialForm.image) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.image) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.preview) %}has-error{% endif %}">
+							{{ form_label(materialForm.preview, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.preview, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(materialForm.preview) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.preview) }}</div>
+							{% endif %}
+						</div>
+						
+						<div class="form-group {% if form_errors(materialForm.content) %}has-error{% endif %}">
+							{{ form_label(materialForm.content, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.content, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(materialForm.content) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.content) }}</div>
+							{% endif %}
+						</div>
+						
+						<div class="form-group {% if form_errors(materialForm.plus) %}has-error{% endif %}">
+							{{ form_label(materialForm.plus, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.plus, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список плюсов данного плана, пукты вводится через точку с запятой(;) без перносов и пробелов</div>
+							{% if form_errors(materialForm.plus) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.plus) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.minus) %}has-error{% endif %}">
+							{{ form_label(materialForm.minus, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.minus, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список минусов данного плана, пукты вводится через точку с запятой(;) без перносов и пробелов</div>
+							{% if form_errors(materialForm.minus) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.minus) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.externallinks) %}has-error{% endif %}">
+							{{ form_label(materialForm.externallinks, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.externallinks, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список ссылок на статьи на этот план, Сначало ссылка а потом карсная строка("	"), пукты вводится через точку с запятой(;) без перносов и пробелов пример "ya.ru	Яндекс;google.com	Гоогл;"</div>
+							{% if form_errors(materialForm.externallinks) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.externallinks) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(materialForm.videolinks) %}has-error{% endif %}">
+							{{ form_label(materialForm.videolinks, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(materialForm.videolinks, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список ссылок на видео для этого плана, пукты вводится через точку с запятой(;) без перносов и пробелов пример "ya.ru	Яндекс;google.com	Гоогл;"</div>
+							{% if form_errors(materialForm.videolinks) %}
+								<div class="help-block alert alert-danger">{{ form_errors(materialForm.videolinks) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="col-xs-4">
+							<div class="row">
+								<div class="form-group {% if form_errors(materialForm.pricematerial) %}has-error{% endif %}">
+									<div class="form-group {% if form_errors(materialForm.pricematerial) %}has-error{% endif %}">
+										{{ form_label(materialForm.pricematerial, null, {'label_attr': {'class': 'control-label'}}) }}:
+										{{ form_widget(materialForm.pricematerial, { 'attr': {'class':'form-control'} }) }}
+										{% if form_errors(materialForm.pricematerial) %}
+											<div class="help-block alert alert-danger">{{ form_errors(materialForm.pricematerial) }}</div>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+							
+						<div class="col-xs-4">
+							<div class="form-group {% if form_errors(materialForm.pricematerialmeasure) %}has-error{% endif %}">
+								{{ form_label(materialForm.pricematerialmeasure, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(materialForm.pricematerialmeasure, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(materialForm.pricematerialmeasure) %}
+									<div class="help-block alert alert-danger">{{ form_errors(materialForm.pricematerialmeasure) }}</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="col-xs-4">
+							<div class="row">
+								<div class="form-group {% if form_errors(materialForm.complexity) %}has-error{% endif %}">
+									{{ form_label(materialForm.complexity, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(materialForm.complexity, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(materialForm.complexity) %}
+										<div class="help-block alert alert-danger">{{ form_errors(materialForm.complexity) }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+
+
+						{# form_widget(materialForm, {'attr': {'class': 'form-group'}}) #}
+						{# form_errors(materialForm) #}
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-danger">Сохранить</button>
+							{{ returnmaterial| raw }}
+
+							{% if material.id is defined %}
+								<a 
+									class="btn_link icin_btn atcaption" 
+									onclick="if( !confirm('Уверены, что хотите удалить стройматериал {{material.name}}?') ) return false;"
+									href="{{ path('material_delete', { 'id':material.id }) }}"
+								>
+									<span class="glyphicon glyphicon-remove"></span> Удалить
+								</a>
+							{% endif %}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}{% endblock javascriptSlide %}

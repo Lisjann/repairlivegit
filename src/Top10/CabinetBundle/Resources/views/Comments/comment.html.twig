@@ -1,0 +1,55 @@
+{# src/top10/CabinetBundle/Resources/views/Comment/comment.html.twig #}
+{% set user = app.security.getToken().getUser() %}
+<div class="container comments block-border">
+
+	<div class="col-lg-12">
+		<a name="comments"></a>
+		<h2>Комментарии({{ commentsCount }})</h2>
+		<div class="comments_list">
+			<table>
+				<tr>
+					<td class="comments_list_left">
+						{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+							{% if user.avatar %}
+								<a href="{{ path( 'fos_user_profile_show' ) }}" class="userpic big">
+									<img src="{{ app.security.getToken().getUser().getAvatar()|imagine_filter('userpic') }}" alt=""/>
+								</a>
+							{% else %}
+								<div class="userpic big">{{ user|slice(0, 2)|upper }}</div>
+							{% endif %}
+						{% else %}
+							<div class="unc_author_comment_icon"></div>
+						{% endif %}
+					</td>
+					<td class="comments_list_right">
+						<form role="form" action="{{ path_form }}#comments" method="post" {{ form_enctype(commentsForm) }} >
+							<div class="form-group">
+								{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+									<strong>
+										<a href="{{ path( 'fos_user_profile_show' ) }}">{{ user }}</a>
+									</strong>
+								{% else %}
+									{{ form_widget(commentsForm.author, { 'attr': {'class': 'form-control', 'placeholder': 'представтесь', 'value': null} }) }}
+									<!--span class="help-block">{#{ form_errors(commentsForm.author) }#}</span-->
+								{% endif %}
+							</div>
+							 <div class="form-group">
+								{{ form_widget(commentsForm.content, { 'value': null, 'attr': {'class': 'form-control', 'placeholder': 'оставьте свой комментарий'} }) }}
+								<!--span class="help-block">{#{ form_errors(commentsForm.content) }#}</span-->
+							</div>
+							<div class="form-group">
+								{{ form_rest(commentsForm) }}
+								{#{ form_errors(commentsForm) }#}
+								<input type="submit" class="btn btn-danger" value="комментировать" />
+							</div>
+						</form>
+					</td>
+				</tr>
+
+				{% include 'Top10CabinetBundle:Comments:index.html.twig' with { 'comments' : comments } %}
+
+			</table>
+		</div>
+	</div>
+
+</div>

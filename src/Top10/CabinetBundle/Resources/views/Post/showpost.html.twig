@@ -1,0 +1,176 @@
+{% extends '::base.html.twig' %} 
+
+{% block title %}{% if post.title != '' %}{{post.title}}{% else %}{{post.name}} - РемонтLive{% endif %}{% endblock %}
+
+{% block keywords %}{{post.keywords}}{% endblock %}
+{% block description %}{{post.description}}{% endblock %}
+
+{% block javascript %}
+	<script type="text/javascript">
+		$(function() {
+			$('.response_click').click( function(){
+				$("div.response_area").empty();
+				var $response_click = $(this);
+				$.ajax({
+					cache: false,
+					//url: '/app_dev.php/commentresponse/post_show/{{post.id}}/{{post.code}}/' + $response_click.attr("data-parent") ,
+					url: '/commentresponse/post_show/{{post.id}}/{{post.code}}/' + $response_click.attr("data-parent") ,
+					success: function(html){
+						$response_click.closest(".comment").find('.response_area').html(html);
+					}
+				});
+			});
+
+	{% if likesClass.enabled == likesClass.live %}
+
+			var i = 0;
+			if( i == 0 ){
+				$('.{{likesClass.enabled}}').click( function() {
+					var $likes_click = $(this);
+					$.ajax({
+						cache: false,
+						//url: '/app_dev.php/like/posts/{{post.id}}',
+						url: '/like/posts/{{post.id}}',
+						success: function(html){
+							$likes_click.find('.likes_count').html(html);
+							$likes_click.attr('class', '{{likesClass.disabled}}');
+							i++;
+						}
+					});
+				});
+			}
+
+	{% endif %}
+		});
+	</script>
+{% endblock %}
+
+{% block slides_block %}
+{% endblock slides_block %}
+
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			<div class="post block-border {% if post.approved == 0 %}notapproved{% endif %}" itemscope itemtype="http://schema.org/Article">
+				<!--h1 itemprop="name">{#{post.name}#}</h1-->
+				<div class="col-xs-12">
+					<table class="meta">
+						<tr>
+							<td class="date">
+								<time itemprop="dateCreated" datetime="{{post.created|date('Y-m-d')}}">{{post.created|date('d.m.Y')}}</time>
+							</td>
+							<td class="author">
+								<a href="{{ path('user_show', {'username': post.author.username }) }}" itemprop="author">{{post.author.username}}</a>
+							</td>
+							<td class="comment_count">
+								<a href="#comments">
+									{% if commentsCount > 0 %}
+										<span itemprop="commentCount">{{ commentsCount }}</span> <span class="hidden-xs">комментария</span>
+									{% else %}
+										<span class="hidden-xs">комментировать...</span><span class="visible-xs">...</span>
+									{% endif %}
+								</a>
+							</td>
+						</tr>
+						<tr>
+							{% if post.tagsforegin.count %}
+								<td class="tag" colspan="3">
+								{% for tagsforegin in post.tagsforegin %}
+									<a href="{{ path( 'post_tag', {'tag_code':tagsforegin.tags.code} ) }}" itemprop="keywords">{{ tagsforegin.tags.name ~ ';' }}</a>
+								{% endfor %}
+								</td>
+							{% endif %}
+						</tr>
+					</table>
+
+					<p class="preview" itemprop="about">{{ post.preview | raw }}</p>
+
+					{# обрезает статью вместе с тегами del и просит регистрацию/авторизацию #}
+					{% if app.security.getToken().getUser() == 'anon.' %}
+						{% set arrcontent = post.content|split('<del></del>') %}
+						{% if arrcontent|length > 1 %}
+							{% set content = arrcontent[0] ~ '... 
+								<br/>
+								<br/>
+								<div class="alert alert-danger">
+									Для того чтобы получить полный доступ к статье авторизуйтеь 
+									<a class="btn_link icin_btn" href="' ~ path('fos_user_security_login') ~ '"><span class="glyphicon glyphicon-user"></span> Войти</a>
+									или зарегистрируйтесь 
+									<a class="btn_link icin_btn" href="' ~ path('fos_user_registration_register') ~ '"><span class="glyphicon glyphicon-check"></span> Регистрация</a>
+								</div>'  %}
+						{% else %}
+							{% set content = post.content %}
+						{% endif %}
+					{% else %}
+						{% set content = post.content %}
+					{% endif %}
+					{# обрезает статью вместе с тегами del и просит регистрацию/авторизацию #}
+
+
+					<span itemprop="description">{{ content | raw }}</span>
+					
+					{% if isWriter %}
+						<div class="col-lg-12">
+							<div class="row">
+								<a class="btn_link icin_btn" href="{{ path('post_edit', { 'id':post.id }) }}"><span class="glyphicon glyphicon-pencil"></span> Изменить.</a>
+								<a  class="btn_link icin_btn"
+									onclick="if( !confirm('Уверены, что хотите удалить пост?') ) return false;" 
+									href="{{ path('post_delete', { 'id':post.id }) }}">
+										<span class="glyphicon glyphicon-remove"></span> Удалить
+								</a>
+							</div>
+						</div>
+					{% endif %}
+
+					{% include 'Top10CabinetBundle:Default:social_share.html.twig' with { 'likesCount' : likesCount } %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock body %}
+
+
+
+{% block right_content %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+{% endblock right_content %}
+
+
+
+
+{% block bottom_content %}
+
+	<h3 class="red_line">Читать по теме</h3>
+	<div class="row widget_list block-border">
+		{% for post_pop in postNextPrev %}
+			<div class="col-sm-4 col-md-4">
+				<div class="thumbnail">
+				{% if post_pop.image %}
+					<div class="xs-row-top-left-right">
+						<a class="img_link" href="{{ path('post_show', { 'id':post_pop.id, 'code':post_pop.code }) }}">
+							<img src="{{ asset( post_pop.image ) }}"  alt="{{ post_pop.name }}" title="{{ post_pop.name }}" />
+						</a>
+					</div>
+				{% endif %}
+				<div class="caption">
+					<p>
+						<a href="{{ path('post_show', { 'id':post_pop.id, 'code':post_pop.code }) }}">{{ post_pop.name }}</a>
+					</p>
+				</div>
+				</a>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+
+	{% if post.approved == 1 %}
+		{% set path_form = path( 'post_show', { 'id':post.id, 'code':post.code } ) %}
+		{#% include 'Top10CabinetBundle:Comments:comment.html.twig' with { 'path_form' : path_form } %#}
+	{% endif %}
+
+{% endblock bottom_content %}

@@ -1,0 +1,46 @@
+{% for post in posts %}
+	<div class="post_room block-border {% if post.approved == 0 %}notapproved{% endif %}">
+		<div class="col-md-3 col-sm-12">
+			<div class="xs-row-top-left-right">
+				<a class="img_link" href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}">
+					{% if post.image %}
+						<img src="{{ post.image|imagine_filter('roomhome') }}"  alt="{{ post.name }}" title="{{ post.name }}" class="img-responsive" />
+					{% endif %}
+					<div class="dark"></div>
+				</a>
+			</div>
+		</div>
+		<div class="col-md-9 col-sm-12">
+			<h2>
+				<a href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}">{{ post.name }}</a>
+			</h2>
+
+			<table class="post_info">
+				<tr>
+					<td class="date">
+						<span class="post_info_icon">{{post.created|date('d.m.Y')}}</span>
+					</td>
+					<td class="likes">
+						<div class="likes_icon">
+							<span class="glyphicon glyphicon-heart"></span>
+						</div>
+						<div class="likes_count">{{ post.likes|length }}</div>
+					</td>
+					{% if post.comments|length > 0 %}
+						<td class="comment_count">
+							<a href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}#comments" class="post_info_icon">
+								{{ post.comments|length }}
+							</a>
+						</td>
+					{% else %}
+						<td class="comment_count">
+							<a class="post_info_icon" href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}#comments">...</a>
+						</td>
+					{% endif %}
+				</tr>
+			</table>
+
+			<p>{{ post.previewFirstWords() | raw }}</p>
+		</div>
+	</div>
+{% endfor %}

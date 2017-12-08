@@ -1,0 +1,455 @@
+{% extends '::basenoright.html.twig' %}
+{% set arrRequest = app.request.get('p') %}
+
+{% set anket_caption = 'Анкета' %}
+{% set layout_caption = 'Планировка' %}
+{% set collage_caption = 'Каллаж' %}
+{% set reamingwalls_caption = 'Развертка стен' %}
+{% set threedmodel_caption = '3D визуализация' %}
+{% set planlist_caption = 'План-проект' %}
+{% set postslist_caption = 'Домовой журнал' %}
+
+{% block title %}{{room.name}} - РемонтLive{% endblock %}
+
+{% block keywords %}{{room.keywords}}{% endblock %}
+{% block description %}{{room.description}}{% endblock %}
+
+{% block javascript %}
+	<link href="{{ asset('bundles/cabinet/OwlCarousel/docs/assets/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+	<script src="{{ asset('bundles/cabinet/OwlCarousel/docs/assets/owlcarousel/owl.carousel.js') }}"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			$('.response_click').click( function(){
+				$("div.response_area").empty();
+				var $response_click = $(this);
+				$.ajax({
+					cache: false,
+					//url: '/app_dev.php/commentresponse/room_show/{{room.id}}/{{room.code}}/' + $response_click.attr("data-parent") ,
+					url: '/commentresponse/room_show/{{room.id}}/{{room.code}}/' + $response_click.attr("data-parent") ,
+					success: function(html){
+						$response_click.closest(".comment").find('.response_area').html(html);
+					}
+				});
+			});
+
+	{% if likesClass.enabled == likesClass.live %}
+
+			var i = 0;
+			if( i == 0 ){
+				$('.{{likesClass.enabled}}').click( function() {
+					var $likes_click = $(this);
+					$.ajax({
+						cache: false,
+						//url: '/app_dev.php/like/rooms/{{room.id}}',
+						url: '/like/rooms/{{room.id}}',
+						success: function(html){
+							$likes_click.find('.likes_count').html(html);
+							$likes_click.attr('class', '{{likesClass.disabled}}');
+							i++;
+						}
+					});
+				});
+			}
+
+	{% endif %}
+		});
+
+		$(function () {
+			$('.tree li:has(ul)').addClass('parent_li').find(' > .toggle_branch').attr('title', 'Свернуть ');
+
+			$('.item').change( function() {
+				if( $(this).prop("checked") )
+					$(this).closest('.branch').find('.panel-body input').prop("disabled", false);
+				else
+					$(this).closest('.branch').find('.panel-body input').prop('disabled');
+			});
+
+			$('.tree li.parent_li > .branch .toggle_branch').on('click', function (e) {
+				var children = $(this).closest('li.parent_li').find(' > ul > li');
+				if (children.is(":visible")) {
+					children.hide();
+					$(this).attr('title', 'Развернуть').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+				} else {
+					children.show();
+					$(this).attr('title', 'Свернуть').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+				}
+				e.stopPropagation();
+			});
+
+			$('.metadata').tooltip();
+			$('.question').popover()
+			
+			$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+				event.preventDefault();
+				$(this).ekkoLightbox();
+			});
+
+
+			//----------фиксированная правая калонка--------------
+			/*$('#my-affix').affix({
+				offset: {
+				  top: function () {
+					return (this.top = $('#my-affix').outerHeight(true) - 150 )
+				  }
+				, bottom: function () {
+					return (this.bottom = $('footer').outerHeight(true) + $('.bottom_content').outerHeight(true) )
+				  }
+				}
+			  })*/
+			  //----------/фиксированная правая калонка--------------
+
+		});
+
+		$(document).ready(function() {
+		  var owl = $('.owl-carousel');
+		  owl.owlCarousel({
+			margin: 5,
+			autoWidth:true,
+			nav: false,
+			loop: false,
+			stageElement: 'ul',
+			itemElement: 'li',
+			stageClass: 'owl-stage nav nav-tabs',
+			responsive:{
+				0:{
+					items:1
+				},
+				600:{
+					items:3
+				},
+				960:{
+					items:5
+				},
+				1200:{
+					items:6
+				}
+			}
+		  });
+		  
+		/*owl.on('mousewheel', '.owl-stage', function (e) {
+			if (e.deltaY>0) {
+				owl.trigger('next.owl');
+			} else {
+				owl.trigger('prev.owl');
+			}
+			e.preventDefault();
+		});*/
+		  
+		});
+	</script>
+{% endblock %}
+
+{% block slides_block %}
+	{% if slides | length > 0 %}
+		<div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="500000000">
+			<!-- Indicators -->
+			{% if slides | length > 1 %}
+				<ol class="carousel-indicators">
+					{% set i = 0 %}
+					{% for slide in slides %}
+						<li data-target="#carousel-example-generic" data-slide-to="{{ i }}" {% if i == 0 %}class="active"{% endif %}></li>
+						{% set i = i + 1 %}
+					{% endfor %}
+				</ol>
+			{% endif %}
+
+			<!-- Wrapper for slides -->
+			<div class="carousel-inner">
+				{% set i = 0 %}
+				{% for slide in slides %}
+					<div class="item {% if i == 0 %}active{% endif %}">
+					  <img src="{{ slide.image }}" alt="{{slide.description}}"/>
+					  {% if slide.description != '' %}
+						  <div class="carousel-caption hidden-xs">
+							{{slide.description | raw }}
+						  </div>
+					  {% endif %}
+					</div>
+				{% set i = i + 1 %}
+				{% endfor %}
+			</div>
+			{% if slides | length > 1 %}
+				<!-- Controls -->
+				<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a>
+				<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+					<span class="glyphicon glyphicon-chevron-right"></span>
+				</a>
+			{% endif %}
+		</div>
+	{% endif %}
+{% endblock slides_block %}
+
+{% block body %}
+<div class="col-sm-12 center_content">
+	<div class="xs-row">
+		<div class="owl-carousel">
+		  <a href="#room" data-toggle="tab">О комнате</a>
+		  <a href="#anket" data-toggle="tab">{{ anket_caption }}</a>
+		  <a href="#layout" data-toggle="tab">{{ layout_caption }}</a>
+		  <a href="#collage" data-toggle="tab">{{ collage_caption }}</a>
+		  <a href="#reamingwalls" data-toggle="tab">{{ reamingwalls_caption }}</a>
+		  <a href="#threedmodel" data-toggle="tab">{{ threedmodel_caption }}</a>
+		  <a href="#planlist" data-toggle="tab">{{ planlist_caption }}</a>
+		</div>
+
+		<!--ul class="nav nav-tabs owl-carousel">
+		  <li class="active"><a href="#room" data-toggle="tab">О комнате</a></li>
+		  <li><a href="#anket" data-toggle="tab">{{ anket_caption }}</a></li>
+		  <li><a href="#layout" data-toggle="tab">{{ layout_caption }}</a></li>
+		  <li><a href="#collage" data-toggle="tab">{{ collage_caption }}</a></li>
+		  <li><a href="#reamingwalls" data-toggle="tab">{{ reamingwalls_caption }}</a></li>
+		  <li><a href="#threedmodel" data-toggle="tab">{{ threedmodel_caption }}</a></li>
+		  <li><a href="#planlist" data-toggle="tab">{{ planlist_caption }}</a></li>
+		</ul-->
+
+		<div class="col-sm-12">
+			<div class="row">
+				<div class="tab-content">
+					<div class="tab-pane active" id="room">
+						<div class="room block-border {% if room.approved == 0 %}notapproved{% endif %}">
+							<div class="col-xs-12">
+								{% if isWriter %}
+									<div class="col-lg-12">
+										<div class="row"">
+											<a class="btn_link icin_btn" href="{{ path('room_edit', { 'id':room.id }) }}"><span class="glyphicon glyphicon-pencil"></span> Изменить.</a>
+											<a  class="btn_link icin_btn"
+												onclick="if( !confirm('Уверены, что хотите удалить комнату?') ) return false;" 
+												href="{{ path('room_delete', { 'id':room.id }) }}">
+													<span class="glyphicon glyphicon-remove"></span> Удалить
+											</a>
+										</div>
+									</div>
+								{% endif %}
+
+								<table class="meta">
+									<tr>
+										<td class="date">
+											<time datetime="{{room.created|date('Y-m-d')}}">{{room.created|date('d.m.Y')}}</time>
+										</td>
+										<td class="author">
+											<a href="{{ path('user_show', {'username': room.author.username }) }}">{{room.author.username}}</a>
+										</td>
+										<td class="comment_count">
+											<a href="#comments">
+												{% if commentsCount > 0 %}
+													<span>{{ commentsCount }}</span> <span class="hidden-xs">комментария</span>
+												{% else %}
+													<span class="hidden-xs">комментировать...</span><span class="visible-xs">...</span>
+												{% endif %}
+											</a>
+										</td>
+									</tr>
+								</table>
+
+								{{ room.preview | raw }}
+
+								<h2>Характеристики</h2>
+								<p class="preview" >
+									{% if room.propertiesforegin.count %}
+										<ul class="list-unstyled">
+										{% for propertiesforegin in room.propertiesforegin %}
+											<li>{{ propertiesforegin.properties.name ~ ': ' }}<strong>{{ propertiesforegin.value }}</strong> {{ propertiesforegin.properties.measure }}</li>
+										{% endfor %}
+										</ul>
+									{% endif %}
+
+									{{ room.characteristics | raw }}
+								</p>
+
+								{% include 'Top10CabinetBundle:Default:social_share.html.twig' with { 'likesCount' : likesCount } %}
+							</div>
+						</div>
+					</div>
+
+					<div class="tab-pane room" id="anket">
+						{% include 'Top10CabinetBundle:Anket:show.html.twig' with { 'room' : room, 'imgs' : anketimg, caption : anket_caption } %}
+					</div>
+
+					{% include 'Top10CabinetBundle:Room:imglist.html.twig' with { 'imgs' : layout, 'anchor' : 'layout', caption : layout_caption } %}
+
+					{% include 'Top10CabinetBundle:Room:imglist.html.twig' with { 'imgs' : collage, 'anchor' : 'collage', caption : collage_caption } %}
+
+					{% include 'Top10CabinetBundle:Room:imglist.html.twig' with { 'imgs' : reamingwalls, 'anchor' : 'reamingwalls', caption : reamingwalls_caption } %}
+
+					{% include 'Top10CabinetBundle:Room:imglist.html.twig' with { 'imgs' : threedmodel, 'anchor' : 'threedmodel', caption : threedmodel_caption } %}
+
+					{% if planForeginmeta|length > 0 %}
+						<div class="tab-pane room" id="planlist">
+							<div class="block-border">
+								<div class="col-sm-8">
+									<h2>{{ planlist_caption }}</h2>
+								</div>
+
+								<div class="col-sm-4">
+									{% if isWriter %}
+										<a class="btn_link icin_btn atcaption" target="_blanck" href="{{ path( 'plan_add', { 'room_id':room.id }) }}"><span class="glyphicon glyphicon-tasks"></span> Изменить</a>
+									{% endif %}
+								</div>
+								
+								<div class="col-lg-12">
+									<h3 style="margin-top:0">Процент выполнения ремонта</h3>
+								</div>
+								<div class="col-lg-12">
+									<div class="progress">
+										<div
+											class="progress-bar 
+											{% if planIndication.procentWorck < 33 %}
+												progress-bar-info
+											{% elseif planIndication.procentWorck >= 33 and planIndication.procentWorck < 66 %}
+												progress-bar-warning
+											{% elseif planIndication.procentWorck >= 66 %}
+												progress-bar-success
+											{% endif %}"
+											role="progressbar"
+											aria-valuenow="{{ planIndication.procentWorck }}" 
+											aria-valuemin="0"
+											aria-valuemax="100" 
+											style="width: {{ planIndication.procentWorck }}%;"
+										>
+											<span style="color:#2a2323;padding:0 10px">{{ planIndication.procentWorck }}%</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									{% set pricePricesWorkSum =  planIndication.pricesum + planIndication.priceworcksum %}
+									<label for="datebegin" class="col-xs-2 control-label">Весь ремонт:</label>
+									<div class="col-xs-2">
+										<span class="metadata indication" title="Стоимость всего ремонта {{ pricePricesWorkSum }} руб.">
+											<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSum }}
+										</span>
+									</div>
+
+									{% set pricePricesWorkSumFinished =  planIndication.pricesumFinished + planIndication.priceworcksumFinished %}
+									<label for="datebegin" class="col-xs-2 control-label">Потрачено:</label>
+									<div class="col-xs-2">
+										<span class="metadata indication" title="Стоимость уже завершонных пунктов {{ pricePricesWorkSumFinished }} руб.">
+											<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSumFinished }}
+										</span>
+									</div>
+
+									{% set pricePricesWorkSumNoFinished =  pricePricesWorkSum - pricePricesWorkSumFinished %}
+									<label for="datebegin" class="col-xs-2 control-label">Осталось:</label>
+									<div class="col-xs-2">
+										<span class="metadata indication" title="Стоимость еще не выполненых пунктов {{ pricePricesWorkSumNoFinished }} руб.">
+											<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSumNoFinished }}
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="block-border plan">
+								<div class="col-lg-12">
+									{% set planforeginIsset = false %}
+									<div class="tree">
+										{% include 'Top10CabinetBundle:Plan:show_properties.html.twig' with { 'item' : planForeginmeta } %}
+									</div>
+									{% set planforeginIsset = true %}
+
+
+									{% if planforeginIsset == false  %}
+										{% if isWriter %}
+											<p>{{ planlist_caption }} пока не создан...</p>
+											<a class="btn_link icin_btn" target="_blanck" href="{{ path( 'plan_add', { 'room_id':room.id }) }}"><span class="glyphicon glyphicon-tasks"></span> Создать {{ planlist_caption }}</a>
+										{% else %}
+											<p>{{ planlist_caption }} пока не создан...</p>
+										{% endif %}
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{% if posts.count %}
+			<div class="col-sm-8">
+				<div class="row">
+					<a name="postslist"></a>
+					<h3 class="red_line">{{ postslist_caption }}</h3>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="row">
+					{% if isWriter %}
+						<a class="btn_link icin_btn atcaption" target="_blanck" href="{{ path( 'post_add', { 'home_id':room.homes.id } | merge({ 'room': room.id }) ) }}"><span class="glyphicon glyphicon-book"></span> Написать пост</a>
+					{% endif %}
+				</div>
+			</div>
+			
+
+			<div class="posts {% if room.approved == 0 %}notapproved{% endif %}">
+				{% if posts.count > 1 %}
+					<table class="post_info order">
+						<tr>
+							<td class="order asc">
+								<span>сначала:</span>
+							</td>
+							{% if is_granted('ROLE_ADMIN') %}
+									<td class="order asc">
+										<a 
+											{% if app.request.get('order').approved is defined and app.request.get('order').approved == 'ASC' %}class="change"{% endif %} 
+											href="{{ path( 'room_show', { 'id':room.id, 'code':room.code, 'order[approved]':'ASC' } ) }}#postslist"
+										>
+											неопубликованные
+										</a>
+									</td>
+								{% endif %}
+							<td class="order desc">
+								<a 
+									{% if app.request.get('order').date is defined and app.request.get('order').date == 'DESC' or app.request.get('order') is empty %}class="change"{% endif %}
+									href="{{ path( 'room_show', { 'id':room.id, 'code':room.code, 'order[date]':'DESC' }) }}#postslist"
+								>
+									свежие
+								</a>
+							</td>
+							<td class="order desc">
+								<a
+									{% if app.request.get('order').date is defined and app.request.get('order').date == 'ASC' %}class="change"{% endif %}
+									href=" {{ path( 'room_show', { 'id':room.id, 'code':room.code, 'order[date]':'ASC' }) }}#postslist"
+								>
+									старые
+								</a>
+							</td>
+							<td class="order asc">
+								<a 
+									{% if app.request.get('order').pop is defined and app.request.get('order').pop == 'DESC' %}class="change"{% endif %} 
+									href="{{ path( 'room_show', { 'id':room.id, 'code':room.code, 'order[pop]':'DESC' }) }}#postslist"
+								>
+									популярные
+								</a>
+							</td>
+						</tr>
+					</table>
+				{% endif %}
+
+				{% include 'Top10CabinetBundle:Post:postslist.html.twig' with { 'posts' : posts } %}
+			</div>
+
+			{% if posts.count > 1 or app.request.get('page') %}
+				{# display navigation #}
+				{{ knp_pagination_render(posts, null, {}, {'alignment': 'right'}) }}
+			{% endif %}
+
+		{% else %}
+			<p>Напишите пост о вашей комнате и он появиться в этом блоке</p>
+		{% endif %}
+	</div>
+</div>
+{% endblock body %}
+
+{% block bottom_content %}
+	{% if room.approved == 1 %}
+		{% set path_form = path( 'room_show', { 'id':room.id, 'code':room.code } ) %}
+		{% include 'Top10CabinetBundle:Comments:comment.html.twig' with { 'path_form' : path_form } %}
+	{% endif %}
+{% endblock bottom_content %}
+
+{% block javascriptSlide %}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/ItemTransitions/classie.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/ItemTransitions/main.js') }}"></script>
+{% endblock javascriptSlide %}

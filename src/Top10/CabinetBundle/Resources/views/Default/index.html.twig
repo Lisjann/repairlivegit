@@ -1,0 +1,48 @@
+{% extends '::base.html.twig' %}
+
+{% block left_content %}
+	{% include 'FOSUserBundle:Profile:leftcontent.html.twig' with { 'homesRoomsMenu' : homesRoomsMenu } %}
+{% endblock left_content %}
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			<div class="mains">
+				<!--div class="block-border">
+					<div class="col-sm-12 col-xs-12">
+						<h1 class="lead" >Добро пожаловать в сообщество домов. Теперь и у вас есть возможность рассказать о своем уникальном <a href="{{ path('home') }}">Доме</a>.</h1>
+					</div>
+				</div-->
+
+				<h3 class="red_line">Самое свежее</h3>
+				{% include 'Top10CabinetBundle:Default:postlist.html.twig' with { 'postMain' : postMainDate } %}
+
+				<h3 class="red_line">Самое интересное</h3>
+
+				{% include 'Top10CabinetBundle:Default:postlist.html.twig' with { 'postMain' : postMainInterest } %}
+
+
+				<h3 class="red_line">Самое полезное</h3>
+				{% include 'Top10CabinetBundle:Default:postlist.html.twig' with { 'postMain' : postMainUseful } %}
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}
+
+
+
+{% block javascriptSlide %}
+	<script type="text/javascript" >
+		$('.carousel').carousel({
+			interval: false,
+			wrap: false,
+		})
+	</script>
+{% endblock javascriptSlide %}

@@ -1,0 +1,12 @@
+<form class="ym-form" action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+    <div class="ym-fbox-text">
+        {% if invalid_username is defined %}
+            <p>{{ 'resetting.request.invalid_username'|trans({'%username%': invalid_username}, 'FOSUserBundle') }}</p>
+        {% endif %}
+        <label for="username">Введите имя пользователя или E-mail</label>
+        <input type="text" id="username" name="username" required="required" />
+    </div>
+    <div class="ym-fbox-button">
+        <input class="ym-button" type="submit" value="{{ 'resetting.request.submit'|trans({}, 'FOSUserBundle') }}" />
+    </div>
+</form>

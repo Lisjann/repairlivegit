@@ -1,0 +1,122 @@
+{# src/top10/CabinetBundle/Resources/views/Default/postlist.html.twig #}
+
+{% for post_main in postMain %}
+
+	{% if post_main.mainBig == 1 %}
+		<div class="block-border post_main">
+			<a  href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}">
+				{% if post_main.image %}
+					<img src="{{ asset( post_main.image ) }}" alt="{{ post_main.name }}" title="{{ post_main.name }}" class="img-responsive"/>
+				{% endif %}
+				<div class="dark"></div>
+
+				<div class="post_main_text">
+					<table class="post_info">
+						<tr>
+							<td class="date">
+								<span class="post_info_icon">{{post_main.created|date('d.m.Y')}}</span>
+							</td>
+							<td class="author">
+								<a href="{{ path('user_show', {'username': post_main.author.username }) }}" class="post_info_icon hidden-xs">{{post_main.author.username}}</a>
+							</td>
+							<td class="likes">
+								<div class="likes_icon">
+									<span class="glyphicon glyphicon-heart"></span>
+								</div>
+								<div class="likes_count">{{ post_main.likes|length }}</div>
+							</td>
+							<td class="comment_count">
+								<a href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}#comments" class="post_info_icon">
+									{% if post_main.comments|length > 0 %}
+										{{ post_main.comments|length }} <span class="hidden-sm hidden-xs">комментария</span>
+									{% else %}
+										<span class="hidden-sm hidden-xs">комментировать...</span>
+									{% endif %}
+								</a>
+							</td>
+						</tr>
+					</table>
+					<h2>{{ post_main.name }}</h2>
+				</div>
+			</a>
+		</div>
+	{% endif %}
+
+	{% if post_main.mainSmall == 1 %}
+		<div class="block-border post_main_small hidden-xs hidden-sm">
+			<div class="col-sm-5 col-xs-12">
+				<a class="img_link" href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}">
+					{% if post_main.image %}
+						<img src="{{ post_main.image|imagine_filter('mainsmall')  }}"  alt="{{ post_main.name }}" title="{{ post_main.name }}" class="img-responsive"/>
+					{% endif %}
+					<div class="dark"></div>
+
+					<div class="post_main_text">
+						<table class="post_info">
+							<tr>
+								<td class="date">
+									<span class="post_info_icon">{{post_main.created|date('d.m.Y')}}</span>
+								</td>
+								<td class="likes">
+									<div class="likes_icon">❤</div>
+									<div class="likes_count">{{ post_main.likes|length }}</div>
+								</td>
+								{% if post_main.comments|length > 0 %}
+									<td class="comment_count">
+										<a href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}#comments" class="post_info_icon">
+											{{ post_main.comments|length }}
+										</a>
+									</td>
+								{% else %}
+									<td class="comment_count">
+										<a class="post_info_icon" href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}#comments">...</a>
+									</td>
+								{% endif %}
+							</tr>
+						</table>
+					</div>
+				</a>
+			</div>
+			<div class="col-sm-7 hidden-xs">
+				<h2>
+					<a href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}">{{ post_main.name }}</a>
+				</h2>
+				<p>{{ post_main.previewFirstWords(25) | raw }}</p>
+			</div>
+		</div>
+
+		<a class="post_main visible-xs visible-sm" href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}">
+			{% if post_main.image %}
+				<img src="{{ asset( post_main.image ) }}" alt="{{ post_main.name }}" title="{{ post_main.name }}" class="img-responsive"/>
+			{% endif %}
+			<div class="dark"></div>
+
+			<div class="post_main_text">
+				<table class="post_info">
+					<tr>
+						<td class="date">
+							<span class="post_info_icon">{{post_main.created|date('d.m.Y')}}</span>
+						</td>
+						<td class="author">
+							<a href="{{ path('user_show', {'username': post_main.author.username }) }}" class="post_info_icon hidden-xs">{{post_main.author.username}}</a>
+						</td>
+						<td class="likes">
+							<div class="likes_icon">❤</div>
+							<div class="likes_count">{{ post_main.likes|length }}</div>
+						</td>
+						<td class="comment_count">
+							<a href="{{ path('post_show', { 'id':post_main.id, 'code':post_main.code }) }}#comments" class="post_info_icon">
+								{% if post_main.comments|length > 0 %}
+									{{ post_main.comments|length }} <span class="hidden-sm hidden-xs">комментария</span>
+								{% else %}
+									<span class="hidden-sm hidden-xs">комментировать...</span>
+								{% endif %}
+							</a>
+						</td>
+					</tr>
+				</table>
+				<h2>{{ post_main.name }}</h2>
+			</div>
+		</a>
+	{% endif %}
+{% endfor %}

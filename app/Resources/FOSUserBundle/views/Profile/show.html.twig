@@ -1,0 +1,74 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			{% include "FOSUserBundle:Profile:show_content.html.twig" %}
+
+			{% if homes|length > 1 %}
+				<h3 class="red_line">Мои дома</h3>
+			{% else %}
+				<h3 class="red_line">Мой дом</h3>
+			{% endif %}
+
+			{# include 'Top10CabinetBundle:Home:homeslist.html.twig' with { 'homes' : homes } ошибка #}
+			{% if homes|length > 0 %}
+				<div class="homes">
+					{% for home in homes %}
+						<div class="home block-border {% if home.approved == 0 %}notapproved{% endif %}">
+							<div class="col-lg-12">
+								{% if home.slides|length > 0 %}
+								<a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}">
+									<img src="{{ home.slides|first.image|imagine_filter('roomhome') }}"/>
+								</a>
+								{% endif %}
+								<h2><a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}">{% if home.homestype|length > 0  %}{{ home.homestype.name }}. {% endif %}{{home.name}}</a></h2>
+								<table class="meta">
+									<tr>
+										<td class="date"><time datetime="{{home.created|date('Y-m-d')}}">{{home.created|date('d.m.Y')}}</time></td>
+										<td class="author"><a href="{{ path('user_show', {'username': home.author.username }) }}">{{home.author.username}}</a></td>
+										<td class="likes">
+											<div class="likes_icon">❤</div>
+											<div class="likes_count">{{ home.likes|length }}</div>
+										</td>
+										<td class="comment_count">
+											<a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}#comments">
+												{% if home.comments|length > 0 %}
+													<span>{{ home.comments|length }}</span> комментария
+												{% else %}
+													комментировать...
+												{% endif %}
+											</a>
+										</td>
+									</tr>
+								</table>
+								{% include 'Top10CabinetBundle:Default:social_share_list.html.twig' with {
+									'path_edit' : 'home_edit',
+									'path_show' : 'home_show',
+									'object' : home,
+									} 
+								%}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="row">
+					<div class="col-sm-2 hidden-xs"></div>
+					<div class="col-sm-10 col-xs-12">
+						<p>Вы пока что не разместили свой дом</p>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
+
+
+
+{% block right_content %}
+
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}

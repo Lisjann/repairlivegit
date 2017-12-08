@@ -1,0 +1,59 @@
+{% if item|length > 0 %}
+	<ul>
+	{% for children in item %}
+		{% if notid is defined and children.id != notid %}
+			{% if children.type == 'caption' %}
+				<li class="caption">
+					{% if children.parent.id is defined %}<h3>{% else %}<h2>{% endif %}
+						<input 
+							type="radio" 
+							id="{{'item_' ~ children.code}}" 
+							class="item material"
+							name="plan"
+							plan-name="{{ children.name }}"
+							value="{{ children.id }}"
+						/>
+						{{children.name}}
+					{% if children.parent.id is defined %}</h3>{% else %}</h2>{% endif %}
+
+					{% include 'Top10CabinetBundle:Plan:properties.html.twig' with { 'item' : children.children } %}
+				</li>
+			{% endif %}
+
+			{% if children.type == 'checkbox' or children.type == 'tree' %}
+					<li {% if children.parent|length > 0 and children.parent.type != 'caption' %}style="display:none"{% endif %}>
+						<div class="branch panel panel-default">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-xs-1">
+										{% if  children.type == 'tree' %}
+											<input 
+												type="radio" 
+												id="{{'item_' ~ children.code}}" 
+												class="item material"
+												name="plan"
+												plan-name="{{ children.name }}"
+												value="{{ children.id }}"
+											/>
+										{% endif %}
+									</div>
+									<div class="col-xs-2">
+										{% if children.children|length > 0 %}
+											<span class="glyphicon glyphicon-plus toggle_branch"></span>
+										{% endif %}
+									</div>
+									<div class="col-xs-8">
+										<div class="row">
+											<span>{{ children.name }}</span> &nbsp;
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% include 'Top10CabinetBundle:Plan:properties.html.twig' with { 'item' : children.children } %}
+					</li>
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	</ul>
+{% endif %}

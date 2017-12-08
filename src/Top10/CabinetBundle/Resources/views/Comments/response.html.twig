@@ -1,0 +1,23 @@
+{# src/top10/CabinetBundle/Resources/views/Comment/response.html.twig #}
+{% set user = app.security.getToken().getUser() %}
+<form role="form" action="{{ path( typecr, { 'id':type_id, 'code':type_code }) ~ '#into' ~ parent_id }}" method="post" {{ form_enctype(commentsFormResponse) }} >
+	 <div class="form-group">
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+			<strong>
+				<a href="{{ path( 'fos_user_profile_show' ) }}">{{ user }}</a>
+			</strong>
+		{% else %}
+			{{ form_widget(commentsFormResponse.author, { 'attr': {'class': 'form-control', 'placeholder': 'представтесь', 'value': null} }) }}
+			<!--span class="help-block">{#{ form_errors(commentsFormResponse.author) }#}</span-->
+		{% endif %}
+	</div>
+	 <div class="form-group">
+		{{ form_widget(commentsFormResponse.content, { 'value': null, 'attr': {'class': 'form-control', 'placeholder': 'оставьте свой комментарий'} }) }}
+		<!--span class="help-block">{#{ form_errors(commentsFormResponse.content) }#}</span-->
+	</div>
+	<div class="form-group">
+		{{ form_widget(commentsFormResponse.parentint, { 'attr': {'value': parent_id} } ) }}
+		{{ form_rest(commentsFormResponse) }}
+		<input type="submit" class="btn btn-danger" value="комментировать" />
+	</div>
+</form>

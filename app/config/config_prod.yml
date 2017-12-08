@@ -1,0 +1,44 @@
+imports:
+    - { resource: config.yml }
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+
+monolog:
+    handlers:
+         main:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: info
+            channels: !import
+#        main:
+#            type:         fingers_crossed
+#            action_level: error
+#            handler:      nested
+#        nested:
+#            type:  stream
+#            path:  %kernel.logs_dir%/%kernel.environment%.log
+#            level: debug
+         import:
+            type: stream
+            path: "%kernel.logs_dir%/import.%kernel.environment%.log"
+            channels: import
+
+top10_cabinet:
+    # email на которые будут отправлять сообщения в случае чего
+    emails:
+        - "admin@repairlive.ru"
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: smtp
+    host:      localhost
+    username:  admin@repairlive.ru
+    password:  J10ZMjUa
+    spool:
+        type: file
+        path: "%kernel.root_dir%/spool"
+    sender_address: admin@repairlive.ru

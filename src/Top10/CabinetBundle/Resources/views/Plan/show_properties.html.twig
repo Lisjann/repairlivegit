@@ -1,0 +1,423 @@
+{% if item|length > 0 %}
+	<ul>
+	{% for children in item %}
+
+		{% if children.value == 'Y' %}
+			{% if children.plan.type == 'caption' %}
+				<li class="caption">
+					{% if children.parent.id is defined %}<h3>{% else %}<h2>{% endif %}
+						{{children.plan.name}}
+					{% if children.parent.id is defined %}</h3>{% else %}</h2>{% endif %}
+					{% include 'Top10CabinetBundle:Plan:show_properties.html.twig' with { 'item' : children.children } %}
+				</li>
+			{% endif %}
+
+			{% if children.plan.type == 'checkbox' or children.plan.type == 'tree' %}
+				<li {% if children.parent|length > 0 and children.parent.plan.type != 'caption' %}style="display:none"{% endif %}>
+					<div class="branch panel panel-default">
+						<div class="panel-heading
+							{% if ( children.plan.type == 'tree' and children.countplanyes == 0 ) or ( children.finished == 'Y' and children.plan.type == 'checkbox' ) %}
+								finished-heading
+							{% endif %}"
+						>
+							<div class="row">
+								<div class="col-xs-2">
+									{% if children.children|length > 0 %}
+										<span class="glyphicon glyphicon-plus toggle_branch"></span>
+									{% endif %}
+									{% if children.plan.type == 'checkbox' %}
+										<span class="glyphicon glyphicon-chevron-up toggle_properties collapsed metadata" title="Дополнительные параметры" data-toggle="collapse" data-target="{{ '#properties' ~ children.id ~ '-' ~ loop.index }}"></span>
+									{% endif %}
+								</div>
+								<div class="col-xs-4">
+									<div class="row">
+										<span>{{ children.plan.name }}
+										{% if children.children|length > 0 %}
+											{% if children.countplanyes > 0 or children.countfinished > 0 %}
+												{% set countall = children.countplanyes + children.countfinished %}
+												<span class="badge pull-right metadata" title="Количество выбранных работ {{ countall }} в категории {{ children.plan.name }} ">
+													{{ countall }}
+												</span>
+											{% endif %}
+										{% endif %}
+										</span> &nbsp;
+									</div>
+								</div>
+								<div class="col-xs-6 metadatas">
+									{% if children.children|length > 0 %}
+										{% if children.countfinished > 0 %}
+											<span class="metadata finished" title="Колличество выполненых работ">
+												<span class="glyphicon glyphicon-ok"></span>{{ children.countfinished }}
+											</span>&nbsp;
+										{% endif %}
+
+										{% if children.daystobeginchild > 0 %}
+											<span 
+												class="metadata"
+												style="color:#428bca"
+												title='В категории "{{ children.plan.name }}" ближайшая работа начнется через {{children.daystobeginchild}} дня'
+											>
+												<span class="glyphicon glyphicon-calendar"></span>+{{children.daystobeginchild}}
+											</span>
+										{% endif %}
+
+										{% if children.daystobeginchild <= 0 and children.daystobeginchild is not null and children.daystoendchild >= 0 and children.daystoendchild is not null %}
+											<span 
+												class="metadata"
+												style="color:#f0ad4e;"
+												title='В категории "{{ children.plan.name }}" на сегодня заплонированны работы по ремонту и продляться еще {{children.daystoendchild}} дня'
+											>
+												<span class="glyphicon glyphicon-calendar"></span> в процессе
+											</span>&nbsp;
+										{% endif %}
+
+										{% if children.daystoendchild < 0 %}
+											<span 
+												class="metadata"
+												style="color:#d9534f;"
+												title='В категории "{{ children.plan.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+											>
+												<span class="glyphicon glyphicon-calendar"></span>{{ children.daystoendchild }}
+											</span>&nbsp;
+										{% endif %}
+
+										{% if children.dayworckchild is not null %}
+											<span class="metadata" title="Общее время на работу {{children.dayworckchild}} дня">
+												<span class="glyphicon glyphicon-time"></span>{{children.dayworckchild}}
+											</span>&nbsp;
+										{% endif %}
+
+										{% set sum = children.sumprice + children.sumpricefinished %}
+										{% if sum > 0 %}
+											<span class="metadata" title="Общая сумма {{ sum }} руб.">
+												<span class="glyphicon glyphicon-rub" ></span>{{ sum }}
+											</span>&nbsp;
+										{% endif %}
+									{% endif %}
+
+									{#--------------------------------Рассчет времени пункта плана-----------------------------------------#}
+									{% if children.plan.type == 'checkbox' %}
+										{% if children.finished == 'Y' %}
+												<span class="metadata finished" title="Работа выполнена">
+													<span class="glyphicon glyphicon-ok"></span>
+												</span>&nbsp;
+										{% else %}
+											{% if children.daystobegin > 0 %}
+												<span 
+													class="metadata"
+													style="color:#428bca"
+													title='В категории "{{ children.plan.name }}" Работа начнется через {{children.daystobegin}} дня'
+												>
+													<span class="glyphicon glyphicon-calendar"></span>+{{children.daystobegin}}
+												</span>&nbsp;
+											{% endif %}
+											{% if children.daystobegin <= 0 and children.daystobegin is not null and children.daystoend >= 0 and children.daystoend is not null %}
+												<span 
+													class="metadata"
+													style="color:#f0ad4e;"
+													title='В категории "{{ children.plan.name }}" на сегодня заплонированны работы по ремонту и продляться еще {{children.daystoend}} дня'
+												>
+													<span class="glyphicon glyphicon-calendar"></span>в процессе
+												</span>&nbsp;
+											{% endif %}
+											{% if children.daystoend < 0 %}
+												<span 
+													class="metadata"
+													style="color:#d9534f;"
+													title='В категории "{{ children.plan.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+												>
+													<span class="glyphicon glyphicon-calendar"></span>{{ children.daystoend }}
+												</span>&nbsp;
+											{% endif %}
+										{% endif %}
+
+										{% if children.dayworck is not null %}
+											<span class="metadata" title="Общее время на работу {{children.dayworck}} дня">
+												<span class="glyphicon glyphicon-time"></span> {{children.dayworck}}
+											</span>&nbsp;
+										{% else %}
+											{% if children.worcktime != '' %}
+												<span class="metadata" title="Среднее время на работу {{children.worcktime}} дня">
+													<span class="glyphicon glyphicon-time"></span> {{children.worcktime}}
+												</span>&nbsp;
+											{% endif %}
+										{% endif %}
+
+									{% endif %}
+									{#--------------------------------/Рассчет времени пункта плана-----------------------------------------#}
+
+
+									{% if children.quantity >0 and ( children.pricematerial >0 or children.priceworck >0 ) %}
+										{% set sum =  children.quantity * children.priceworck + children.pricematerial %}
+										<span class="metadata" title="Утвержденная сумма {{ sum }} руб.">
+											<span class="glyphicon glyphicon-rub" ></span> {{ sum }}
+										</span>&nbsp;
+									{% else %}
+										{% if children.plan.pricematerial != '' %}
+											<span class="metadata" title="Средняя стоимость материалов {{children.plan.pricematerial}} за {{children.plan.pricematerialmeasure}}">
+												<span class="glyphicon glyphicon-rub" ></span> {{children.plan.pricematerial}}
+											</span>&nbsp;
+										{% endif %}
+										{% if children.plan.priceworck != '' %}
+											<span class="metadata" title="Средняя стоимость работ {{children.plan.priceworck}} за {{children.plan.priceworckmeasure}}">
+												<span class="glyphicon glyphicon-rub" ></span> {{children.plan.priceworck}}
+											</span>&nbsp;
+										{% endif %}
+									{% endif %}
+
+									{% if children.plan.complexity != '' %}
+										<span class="metadata" title="Cложность работ {{children.plan.complexity}} из 5">
+											<span class="glyphicon glyphicon-education"></span> {{children.plan.complexity}}/5
+										</span>&nbsp;
+									{% endif %}
+
+									{% set plus = children.plan.plus|split(';') %}
+									{% set minus = children.plan.minus|split(';') %}
+									{% set externallinks = children.plan.externallinks|split(';') %}
+									{% set videolinks = children.plan.videolinks|split(';') %}
+
+									{% if children.plan.preview != null or children.plan.plus != null or children.plan.minus != null or children.plan.externallinks != null or  children.plan.videolinks != null %}
+										<span   class="question"
+												data-html="true"
+												data-container="body"
+												data-toggle="popover"
+												data-placement="bottom"
+												data-content='
+													<p><img class="img-responsive" src="{{ children.plan.image }}"/></p>
+													<p>{{ children.plan.preview }}</p>
+													{% if children.plan.plus != null or children.plan.minus != "" %}
+														<h4><a href="{{ path("plan_show", { "id":children.plan.id, "code":children.plan.code }) }}#plusminus" target="_blank">Плюсы минусы</a></h4>
+														<div class="row">
+															<div class="col-xs-6">
+															{% for item in plus %}
+																{% if item != "" %}
+																	<p><span class="glyphicon glyphicon-plus"></span> {{ item }}</p>
+																{% endif %}
+															{% endfor %}
+															</div>
+															<div class="col-xs-6">
+															{% for item in minus %}
+																{% if item != "" %}
+																	<p><span class="glyphicon glyphicon-minus"></span> {{ item }}</p>
+																{% endif %}
+															{% endfor %}
+															</div>
+														</div>
+													{% endif %}
+
+													{% if externallinks|length > 1 %}
+														<h4><a href="{{ path("plan_show", { "id":children.plan.id, "code":children.plan.code }) }}#externallinks" target="_blank">Ссылки на статьи</a></h4>
+													{% endif %}
+
+													{% if videolinks|length > 1 %}
+														<h4><a href="{{ path("plan_show", { "id":children.plan.id, "code":children.plan.code }) }}#videolinks" target="_blank">Видео</a></h4>
+													{% endif %}
+												'
+												data-original-title="<a href='{{ path('plan_show', { 'id':children.plan.id, 'code':children.plan.code }) }}' target='_blank'>{{ children.plan.name }}</a>"
+										>
+											<strong>?</strong>
+										</span>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div id="{{ 'properties' ~ children.id ~ '-' ~ loop.index }}" class="collapse panel-body properties form-horizontal">
+							{% if children.plan.type == 'checkbox' %}
+								{% if  children.planforegin.slides %}
+								<div class="row">
+								{% for slide in children.planforegin.slides %}
+									<div class="col-xs-12 col-md-6">
+										<a  href="{{ slide.image }}"
+											data-toggle="lightbox" 
+											data-gallery="example-gallery"
+											data-width="1000"
+											data-title='{% if  children.name != null %}{{ children.name }}{% else %}{{ children.plan.name }}{% endif %}'
+											class="metadata"
+										>
+											<img src="{{ slide.image }}" class="author_portrait img-responsive" alt=""/>
+										</a>
+									</div>
+									{% endfor %}
+								</div>
+								{% endif %}
+
+								{% if  children.name != null %}
+									<div class="form-group">
+										<div class="col-sm-12">
+											<h4>
+												{% if  children.link != null %} <a href="{{ children.link }}" target="_blanck">{% endif %}
+													{{ children.name }}
+												{% if  children.link != null %} </a> {% endif %}
+											</h4>
+										</div>
+									</div>
+								{% endif %}
+
+								{# Для ПК #}
+								<div class="form-group hidden-xs">
+									{% if children.quantity is not null %}
+										<label for="form_description" class="col-sm-2 control-label">Кол-во:</label>
+										<div class=" col-sm-3">
+											<div class="row">
+												{{ children.quantity }} {{ children.plan.priceworckmeasure }}
+											</div>
+										</div>
+									{% endif %}
+
+									{% if children.priceworck is not null %}
+										<label for="form_description" class=" col-sm-4 control-label"><div class="row">Цена работ:</div></label>
+										<div class="col-sm-3">
+											{{ children.priceworck }} руб/{{ children.plan.priceworckmeasure }}
+										</div>
+									{% endif %}
+								</div>
+								{# /Для ПК #}
+
+								{# Для мобильных #}
+								{% if children.quantity is not null %}
+									<div class="form-group visible-xs">
+										<label for="form_description" class="col-xs-6 control-label">Кол-во:</label>
+										<div class="col-xs-6">
+											<div class="row">
+												{{ children.quantity }} {{ children.plan.priceworckmeasure }}
+											</div>
+										</div>
+									</div>
+								{% endif %}
+
+								{% if children.priceworck is not null %}
+									<div class="form-group visible-xs">
+										<label for="form_description" class="col-xs-6  control-label"><div class="row">Цена работ за {{ children.plan.priceworckmeasure }}:</div></label>
+										<div class="col-xs-6 ">
+											{{ children.priceworck }} руб.
+										</div>
+									</div>
+								{% endif %}
+								{# /Для мобильных #}
+
+
+								{# Для ПК #}
+								<div class="form-group hidden-xs">
+									{% if children.datebegin is not null %}
+										<label for="datebegin" class=" col-sm-3 control-label">Дата исполнения от:</label>
+										<div class=" col-sm-4">
+											{{ children.datebegin|date('d.m.y') }}
+										</div>
+									{% endif %}
+
+									{% if children.dateend is not null %}
+										<label for="dateend" class=" col-sm-1 control-label">до:</label>
+										<div class=" col-sm-4">
+											<div class="input-group date" id="dateend">
+												{{ children.dateend|date('d.m.y') }}
+											</div>
+										</div>
+									{% endif %}
+								</div>
+								{# /Для ПК #}
+
+								{# Для мобильных #}
+								{% if children.datebegin is not null %}
+									<div class="form-group visible-xs">
+										<label for="datebegin" class="col-xs-6 control-label">Дата исполнения от:</label>
+										<div class="col-xs-6">
+											{{ children.datebegin|date('d.m.y') }}
+										</div>
+									</div>
+								{% endif %}
+
+								{% if children.dateend is not null %}
+									<div class="form-group visible-xs">
+										<label for="dateend" class="col-xs-6 control-label">до:</label>
+										<div class="col-xs-6">
+											<div class="input-group date" id="dateend">
+												{{ children.dateend|date('d.m.y') }}
+											</div>
+										</div>
+									</div>
+								{% endif %}
+								{# /Для мобильных #}
+
+							{% endif %}
+
+							{% if children.planforegin.materialforegin|length > 0 %}
+								<div class="form-group">
+									<div class="col-xs-12">
+										<h4>Стройматериалы:</h4>
+									</div>
+								</div>
+								{% for materialforegin in children.planforegin.materialforegin %}
+									<div class="form-group">
+										<div class="col-xs-7">
+											<h4 style="margin-top: 0;margin-bottom:0">
+												{% if  materialforegin.link != null %} <a href="{{ materialforegin.link }}" target="_blanck">{% endif %}
+													{{ materialforegin.material.name }}. {{ materialforegin.name }}
+												{% if  materialforegin.link != null %} </a> {% endif %}
+											</h4>
+										</div>
+										<div class="col-xs-2">
+											{{ materialforegin.quantity }} {{ materialforegin.measure }}
+										</div>
+										<div class="col-xs-3">
+											{{ materialforegin.price }} р./{{ materialforegin.measure }}
+										</div>
+									</div>
+								{% endfor %}
+							{% endif %}
+							{% if children.pricematerial is not null %}
+								<label for="form_description" class="col-xs-7 control-label">Итого:</label>
+								<div class=" col-xs-5">
+									<div class="row">
+										{{ children.pricematerial }} руб.
+									</div>
+								</div>
+							{% endif %}
+
+
+							{% if children.planforegin.propertiesforegin|length > 0 %}
+								<div class="form-group">
+									<div class="col-xs-12">
+										<h4>Характеристики:</h4>
+									</div>
+								</div>
+								{% for propertiesforegin in children.planforegin.propertiesforegin %}
+									{% if (propertiesforegin.properties.type == 'number' or propertiesforegin.properties.type == 'text' or propertiesforegin.properties.type == 'choices' ) %}
+										<div class="form-group">
+											<label for="form_description" class="col-xs-6 col-sm-3 control-label">{{ propertiesforegin.properties.name }}:</label>
+											<div class="col-xs-6 col-sm-9">
+												{{ propertiesforegin.value }}	{{propertiesforegin.properties.measure}}
+											</div>
+										</div>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+
+							{% if children.posts|length > 0 %}
+								<div class="form-group">
+									<div class="col-xs-12">
+										<h4>Отчет:</h4>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<h4 style="margin-top: 0;">
+											<a href="{{ path('post_show', { 'id':children.posts.id, 'code':children.posts.code }) }}">
+												{{ children.posts.name }}
+											</a>
+										</h4>
+									</div>
+								</div>
+							{% endif %}
+						
+						</div>
+					</div>
+
+					{% include 'Top10CabinetBundle:Plan:show_properties.html.twig' with { 'item' : children.children } %}
+
+				</li>
+			{% endif %}
+		{% endif %}
+
+	{% endfor %}
+	</ul>
+{% endif %}

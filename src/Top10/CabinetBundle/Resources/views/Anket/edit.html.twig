@@ -1,0 +1,243 @@
+{% extends '::base.html.twig' %} 
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Заполнение анкеты{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+{% block javascript %}
+	{% include 'Top10CabinetBundle:Home:fineuploader.html.twig' %}
+{% endblock %}
+
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			{% if room.id is defined %}
+				{% set returnAnket = '<a class="btn btn-default" href="' ~ path('room_show', { 'id':room.id, 'code':room.code }) ~ '">Отмена</a>' %}
+			{% else %}
+				{% set returnRoom = null %}
+				
+			{% endif %}
+
+			<div class="block-border">
+				<div class="col-lg-12">
+					<form action="{{ path('anket_add', { 'room_id':room.id }) }}" method="POST" role="form" {{ form_enctype(anketForm) }}>
+						<div class="form-group {% if form_errors(anketForm.familymembers) %}has-error{% endif %}">
+							{{ form_label(anketForm.familymembers, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.familymembers, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.familymembers) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.familymembers) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.familymembersplan) %}has-error{% endif %}">
+							{{ form_label(anketForm.familymembersplan, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.familymembersplan, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.familymembersplan) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.familymembersplan) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.hobby) %}has-error{% endif %}">
+							{{ form_label(anketForm.hobby, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.hobby, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.hobby) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.hobby) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.animals) %}has-error{% endif %}">
+							{{ form_label(anketForm.animals, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.animals, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.animals) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.animals) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.guests) %}has-error{% endif %}">
+							{{ form_label(anketForm.guests, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.guests, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.guests) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.guests) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.zone) %}has-error{% endif %}">
+							{{ form_label(anketForm.zone, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.zone, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.zone) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.zone) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.style) %}has-error{% endif %}">
+							{{ form_label(anketForm.style, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.style, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Все стили интерьера вы можете посмотреть <a target="_blank" href="https://rehouz.info/vse-stili-interera-spisok/">здесь</a>, можете указать несколько понравившихся вам стилей. Может вам нравится сочитание нескольких стилей</div>
+							{% if form_errors(anketForm.style) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.style) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.material) %}has-error{% endif %}">
+							{{ form_label(anketForm.material, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.material, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.material) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.material) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.technique) %}has-error{% endif %}">
+							{{ form_label(anketForm.technique, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.technique, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.technique) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.technique) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.electrician) %}has-error{% endif %}">
+							{{ form_label(anketForm.electrician, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.electrician, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.electrician) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.electrician) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.furniture) %}has-error{% endif %}">
+							{{ form_label(anketForm.furniture, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.furniture, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.furniture) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.furniture) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.habitatquality) %}has-error{% endif %}">
+							{{ form_label(anketForm.habitatquality, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.habitatquality, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.habitatquality) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.habitatquality) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.plants) %}has-error{% endif %}">
+							{{ form_label(anketForm.plants, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.plants, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.plants) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.plants) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.save) %}has-error{% endif %}">
+							{{ form_label(anketForm.save, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.save, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.save) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.save) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(anketForm.other) %}has-error{% endif %}">
+							{{ form_label(anketForm.other, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(anketForm.other, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(anketForm.other) %}
+								<div class="help-block alert alert-danger">{{ form_errors(anketForm.other) }}</div>
+							{% endif %}
+						</div>
+
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<label class="control-label">Покажите то что вам нравится</label>
+							<span class="help-block">
+								Загрузите изображения понравившихся вам интерьеров, предметов, которые вы хотите видеть в интерьере, или ассоциации, с которыми вы хотели связать интерьер. Любое количество чем больше тем лучше.
+							</span>
+							<div id="fine-uploader-gallery-anket" class="fine-uploader-gallery"></div>
+						</div>
+
+						{# form_widget(anketForm, {'attr': {'class': 'form-group'}}) #}
+						{# form_errors(anketForm) #}
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-danger">Сохранить</button>
+							{{ returnAnket| raw }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}
+
+
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}
+<script type="text/javascript">
+	//для загрузки развертки стен
+	var uploader = $('#fine-uploader-gallery-anket').fineUploader({
+		debug: true, //включаем дебаг в консоль браузера. 
+		{% if room.id is defined %}
+		session : {
+			endpoint : "{{ path( 'room_uploadlist', {'id':room.id} ) }}?type=anket",
+		},
+		{% endif %}
+		template: 'qq-template-gallery',
+		request: {
+			{% if room.id is defined %}
+				endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}?type=anket",
+			{% else %}
+				endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}?type=anket",
+			{% endif %}
+			//forceMultipart: false,
+			inputName: 'qqfiles', //имя инпут поля типа file
+			/*params: {
+				action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+			}*/
+		},
+		thumbnails: {
+			placeholders: {
+				waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+				notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+			}
+		},
+		
+		resume: {
+			enabled: true
+		},
+		deleteFile: {
+			enabled: true,
+			method: "POST",
+			{% if room.id is defined %}
+				endpoint: "{{ path( 'room_upload', {'id':room.id} ) }}"
+			{% else %}
+				endpoint: "{{ path( 'room_upload', {'id':'roomuser' ~ app.user.id} ) }}"
+			{% endif %}
+		},
+		validation: {
+			allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+			sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+			itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+		},
+		/*dragAndDrop: {
+			disableDefaultDropzone: true //отключаем дроп-зону
+		},*/
+		messages: { //русифицируем некоторые сообщения и кнопки
+			typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+			sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+			//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+		},
+		text: {
+			fileInputTitle: 'Добавить изображение',
+			uploadButton: 'Прикрепить файлы',
+			failUpload: 'Не закачан!'
+		}
+	});
+ </script>
+{% endblock javascriptSlide %}

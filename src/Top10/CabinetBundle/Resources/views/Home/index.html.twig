@@ -1,0 +1,36 @@
+{% extends '::base.html.twig' %}
+
+{% set user = app.security.getToken().getUser() %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}РемонтLife Статьи{% endblock %}
+
+{% block slides_block %}{% endblock slides_block %}
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			<div class="col-lg-12">
+				<div class="row">
+					{% include 'Top10CabinetBundle:Home:homeslist.html.twig' with { 'homes' : homes } %}
+				</div>
+			</div>
+			<div class="col-lg-12">
+				<div class="row" style="margin-bottom:15px;">
+					<a class="btn_link icin_btn" href="{{ path('home_add') }}"><span class="glyphicon glyphicon-plus"></span> Добавить свой Дом</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block right_content %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+{% endblock right_content %}
+
+
+
+{% block javascriptSlide %}{% endblock javascriptSlide %}

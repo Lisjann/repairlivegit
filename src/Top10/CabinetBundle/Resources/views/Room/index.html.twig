@@ -1,0 +1,29 @@
+{% extends '::base.html.twig' %}
+
+{% set user = app.security.getToken().getUser() %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}РемонтLife Статьи{% endblock %}
+
+{% block slides_block %}
+{% endblock slides_block %}
+
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			{% include 'Top10CabinetBundle:Room:roomslist.html.twig' with { 'rooms' : rooms } %}
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}
+
+
+
+
+{% block javascriptSlide %}{% endblock javascriptSlide %}

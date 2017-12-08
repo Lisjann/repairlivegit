@@ -1,0 +1,326 @@
+{% extends '::base.html.twig' %} 
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Редактирование дома{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+{% block jquery %}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/lib/jquery-1.8.3.min.js') }}"></script>
+{% endblock %}
+
+{% block javascript %}
+{# TinyMCE #}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/tinymce/js/tinymce/tinymce.js') }}"></script>
+	<script type="text/javascript">
+		tinymce.init({
+		  verify_html : false,
+		  selector: 'textarea#top10_cabinetbundle_home_preview',
+		  language:'ru',
+		  //width: 790,
+		  height: 500,
+		  //autoresize_min_height: 500,
+		  fixed_toolbar_container: '#mytoolbar',
+		  plugins: [
+			"autoresize advlist stylebuttons autolink  autosave lists charmap pagebreak spellchecker",
+			"searchreplace visualblocks wordcount fullscreen insertdatetime nonbreaking",
+			"directionality emoticons template paste colorpicker textpattern code link"
+		  ],
+
+		  toolbar1: "bold italic underline strikethrough | style-p style-h2 | link unlink | {% if is_granted('ROLE_ADMIN') %}visualblocks code{% endif %}",
+
+		  menubar: false,
+		  toolbar_items_size: 'medium',
+		  visualblocks_default_state: true,
+
+		  style_formats: [{
+			title: 'Bold text',
+			inline: 'b'
+		  }, {
+			title: 'Red text',
+			inline: 'span',
+			styles: {
+			  color: '#ff0000'
+			}
+		  }, {
+			title: 'Red header',
+			block: 'h1',
+			styles: {
+			  color: '#ff0000'
+			}
+		  }, {
+			title: 'Example 1',
+			inline: 'span',
+			classes: 'example1'
+		  }, {
+			title: 'Example 2',
+			inline: 'span',
+			classes: 'example2'
+		  }, {
+			title: 'Table styles'
+		  }, {
+			title: 'Table row 1',
+			selector: 'tr',
+			classes: 'tablerow1'
+		  }],
+
+		  templates: [{
+			title: 'Test template 1',
+			content: 'Test 1'
+		  }, {
+			title: 'Test template 2',
+			content: 'Test 2'
+		  }],
+		  content_css: [
+			'{{ asset("bundles/cabinet/tinymce/js/tinymce/skins/lightgray/content.home.min.css") }}',
+			'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+			'//www.tinymce.com/css/codepen.min.css'
+		  ]
+		});
+	</script>
+
+
+{% include 'Top10CabinetBundle:Home:fineuploader.html.twig' %}
+
+{% endblock %}
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			{% if home.id is defined %}
+				{% set url = path('home_edit', { 'id':home.id })  %}
+				{% set returnHome = '<a class="btn btn-default" href="' ~ path('home_show', { 'id':home.id, 'code':home.code }) ~ '">Отмена</a>' %}
+
+			{% else %}
+				{% set url = path('home_add') %}
+				{% set returnHome = null %}
+			{% endif %}
+
+			<div class="block-border">
+				<div class="col-lg-12">
+					<form action="{{url}}" method="POST" role="form" {{ form_enctype(homeForm) }}>
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+						<div class="form-group">
+							<div id="fine-uploader-gallery"></div>
+							<span class="help-block">
+								Эти картинки будут отбражаться в слайдере на странице вашего дома.<br/>Рекомендуемое разрешение картинку 1200х700 пикселей, если картинка будет больше то ее края обрежутся до этого разрешения
+							</span>
+						</div>
+
+						<div class="form-group {% if form_errors(homeForm.name) %}has-error{% endif %}">
+							{{ form_label(homeForm.name, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(homeForm.name, { 'attr': {'class':'form-control inputname'} }) }}
+							{% if form_errors(homeForm.name) %}
+								<div class="help-block alert alert-danger">{{ form_errors(homeForm.name) }}</div>
+							{% endif %}
+							<span class="help-block">Придумайте оригинальное название, так чтобы оно в картце характеризовала ваш дом, или же назовите дом красивым именем.</span>
+						</div>
+
+						{% if is_granted('ROLE_ADMIN') %}
+							<div class="form-group {% if form_errors(homeForm.created) %}has-error{% endif %}">
+								{{ form_label(homeForm.created, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(homeForm.created, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(homeForm.created) %}
+									<div class="help-block alert alert-danger">{{ form_errors(homeForm.created) }}</div>
+								{% endif %}
+							</div>
+
+							{{ form_widget(homeForm.code, { 'attr': {'class':'form-control'} }) }}
+							<div class="form-group {% if form_errors(homeForm.keywords) %}has-error{% endif %}">
+								{{ form_label(homeForm.keywords, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(homeForm.keywords, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(homeForm.keywords) %}
+									<div class="help-block alert alert-danger">{{ form_errors(homeForm.keywords) }}</div>
+								{% endif %}
+							</div>
+
+							<div class="form-group {% if form_errors(homeForm.description) %}has-error{% endif %}">
+								{{ form_label(homeForm.description, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(homeForm.description, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(homeForm.description) %}
+									<div class="help-block alert alert-danger">{{ form_errors(homeForm.description) }}</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<div class="form-group {% if form_errors(homeForm.preview) %}has-error{% endif %}">
+							{{ form_label(homeForm.preview, null, {'label_attr': {'class': 'control-label'}}) }}
+							{{ form_widget(homeForm.preview, { 'attr': { 'class':'control-label editor'} }) }}
+							<div class="help-block">Думаем вам есть что рассказать о свеом любимом уютном доме, и вам не составит труда написать о нем более чем на 140 символов.<br/>Рекомендуем не писать сплошные длинные тексты, а разделять их на параграфы по 3-5 строк.</div>
+							{% if form_errors(homeForm.preview) %}
+								<div class="help-block alert alert-danger">{{ form_errors(homeForm.preview) }}</div>
+							{% endif %}
+						</div>
+
+						{#----------Свойства дома Самопальная форма---------------- #}
+						<div class="panel panel-default">
+						  <div class="panel-heading">Характеристики</div>
+							<div class="panel-body properties form-horizontal">
+								<div class="form-group {% if form_errors(homeForm.homestypeint) %}has-error{% endif %}">
+									{{ form_label(homeForm.homestypeint, null, {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+									<div class="col-sm-9">
+										{{ form_widget(homeForm.homestypeint, { 'attr': {'class':'form-control'} }) }}
+										{% if form_errors(homeForm.homestypeint) %}
+											<div class="help-block alert alert-danger">{{ form_errors(homeForm.homestypeint) }}</div>
+										{% endif %}
+									</div>
+								</div>
+
+								{% for propertie in properties %}
+									{% set val = null %}
+									{% if home.id is defined %}
+										{% for propertiesforegin in home.propertiesforegin %}
+											{% if propertiesforegin.properties.id == propertie.id %}
+												{% set val = propertiesforegin.value %}
+											{% endif %}
+										{% endfor %}
+									{% endif %}
+
+									{% if propertie.type == 'number' or propertie.type == 'text'%}
+										<div class="form-group">
+											<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+											<div class="col-sm-9">
+												<input type="{{propertie.type}}" id="{{'properties_' ~ propertie.code}}" value="{{ val }}" name="properties[{{ propertie.id }}]" class="form-control"/>
+											{{propertie.measure}}
+											</div>
+										</div>
+									{% endif %}
+
+									{% if propertie.type == 'checkbox' %}
+										<div class="form-group">
+											<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+											<div class="col-sm-9">
+												<input 
+													type="{{propertie.type}}" 
+													id="{{'propertie_' ~ propertie.code}}" 
+													name="properties[{{propertie.id}}]" 
+													value="Есть"
+													{% if val == 'Есть' %}checked="checked"{% endif %} 
+												/>
+											</div>
+										</div>
+									{% endif %}
+
+									{% if propertie.type == 'choices' %}
+										{% if propertie.propertiestypelist %}
+											<div class="form-group">
+												<label for="form_description" class="col-sm-3 control-label">{{ propertie.name }}</label>
+												<div class="col-sm-9">
+													<select id="{{'propertie_' ~ propertie.code}}" name="properties[{{propertie.id}}]" class="form-control">
+														{% for propertiestypelist in propertie.propertiestypelist %}
+															<option value="{{propertiestypelist.value}}" {% if propertiestypelist.value == val %}selected="selected"{% endif %} >{{propertiestypelist.value}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										{% endif %}
+									{% endif %}
+								{% endfor %}
+							</div>
+						</div>
+						{#----------/Свойства дома Самопальная форма---------------- #}
+
+						{% if is_granted('ROLE_ADMIN') %}
+							<div class="form-group {% if form_errors(homeForm.characteristics) %}has-error{% endif %}">
+								{{ form_label(homeForm.characteristics, null, {'label_attr': {'class': 'control-label'}}) }}
+								{{ form_widget(homeForm.characteristics, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(homeForm.characteristics) %}
+									<div class="help-block alert alert-danger">{{ form_errors(homeForm.characteristics) }}</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
+						<div class="form-group">
+							{{ form_widget(homeForm.approved) }} {{ form_label(homeForm.approved, null, {'label_attr': {'class': 'control-label'}}) }}
+						</div>
+
+						{# form_widget(homeForm, {'attr': {'class': 'form-group'}}) #}
+						{# form_errors(homeForm) #}
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-danger">Сохранить</button>
+							{{ returnHome| raw }}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}
+
+
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}
+	 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
+    ====================================================================== -->
+    <script type="text/javascript">
+        var uploader = $('#fine-uploader-gallery').fineUploader({
+            debug: true, //включаем дебаг в консоль браузера. 
+			{% if home.id is defined %}
+			session : {
+				endpoint : "{{ path( 'home_uploadlist', {'id':home.id} ) }}",
+
+			},
+			{% endif %}
+			template: 'qq-template-gallery',
+            request: {
+				{% if home.id is defined %}
+					endpoint: "{{ path( 'home_upload', {'id':home.id} ) }}",
+				{% else %}
+					endpoint: "{{ path( 'home_upload', {'id':'homeuser' ~ app.user.id} ) }}",
+				{% endif %}
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+            thumbnails: {
+                placeholders: {
+                    waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+                    notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+                }
+            },
+			
+            resume: {
+                enabled: true
+			},
+			deleteFile: {
+                enabled: true,
+                method: "POST",
+				{% if home.id is defined %}
+					endpoint: "{{ path( 'home_upload', {'id':home.id} ) }}"
+				{% else %}
+					endpoint: "{{ path( 'home_upload', {'id':'homeuser' ~ app.user.id} ) }}"
+				{% endif %}
+            },
+			validation: {
+                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+            },
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+    </script>
+{% endblock javascriptSlide %}

@@ -1,0 +1,55 @@
+{% if item|length > 0 %}
+	<ul>
+	{% for children in item %}
+		{% if children.type == 'caption' %}
+			<li class="caption">
+				{% if children.parent.id is defined %}<h3>{% else %}<h2>{% endif %}
+					{{children.name}}
+					{% if app.user and is_granted('ROLE_ADMIN') %}
+						<a  class="btn_link icin_btn metadata notext"
+							target="_blanck"
+							href="{{ path( 'material_edit') }}?id={{children.id}}"
+							title="Редактировать пункт плана"
+						>
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+					{% endif %}
+				{% if children.parent.id is defined %}</h3>{% else %}</h2>{% endif %}
+
+				{% include 'Top10CabinetBundle:Material:list.html.twig' with { 'item' : children.children } %}
+			</li>
+		{% endif %}
+
+		{% if children.type == 'checkbox' or children.type == 'tree' %}
+				<li {% if children.parent|length > 0 and children.parent.type != 'caption' %}style="display:none"{% endif %}>
+					<div class="branch panel panel-default">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-2">
+									{% if children.children|length > 0 %}
+										<span class="glyphicon glyphicon-plus toggle_branch"></span>
+									{% endif %}
+									{% if app.user and is_granted('ROLE_ADMIN') %}
+										<a  class="btn_link icin_btn atcaption metadata notext"
+											target="_blanck"
+											href="{{ path( 'material_edit') }}?id={{children.id}}"
+											title="Редактировать пункт плана"
+										>
+											<span class="glyphicon glyphicon-pencil"></span>
+										</a>
+									{% endif %}
+								</div>
+								<div class="col-xs-10">
+									<div class="row">
+										<span>{{ children.name }}</span> &nbsp;
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{% include 'Top10CabinetBundle:Material:list.html.twig' with { 'item' : children.children } %}
+				</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+{% endif %}

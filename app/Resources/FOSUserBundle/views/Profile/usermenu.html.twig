@@ -1,0 +1,81 @@
+{# src/top10/CabinetBundle/Resources/views/Author/usermenu.html.twig #}
+<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+	<li><h4>Мое</h4></li>
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+
+		<li>
+			<a href="{{ path( 'fos_user_profile_show' ) }}">
+				&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;
+				<span>Профиль</span>
+			</a>
+		</li>
+		{% if homesRoomsMenu is defined %}
+			{% for home in homesRoomsMenu %}
+				<li>
+					<a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}" itemprop="name">
+						&nbsp;<span class="glyphicon glyphicon-home"></span>&nbsp;
+						<span>
+							{% if home.homestype|length > 0  %} {{ home.homestype.name }} {% endif %}
+						</span>
+					</a>
+					<ul class="nav nav-pills nav nav-stacked">
+						{% for room in home.rooms %}
+							{% if room.id is defined and room.approved == 1 %}
+								<li>
+									<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}" itemprop="name">
+										&nbsp;<span class="glyphicon glyphicon-bed"></span>&nbsp;
+										<span>{% if room.roomstype is defined  %} {{ room.roomstype.name }} {% endif %}</span>
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+						<li>
+							<a href="{{ path('room_add', { 'home_id':home.id }) }}" itemprop="name">
+								&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
+								<span>Добавить комнату</span>
+							</a>
+						</li>
+					</ul>
+				</li>
+			{% endfor %}
+		{% endif %}
+		<li>
+			<a href="{{ path('home_add') }}" itemprop="name">
+				&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
+				<span>Добавить Дом</span>
+			</a>
+		</li>
+		<li>
+			<a href="{{ path('fos_user_security_logout') }}" itemprop="name">
+				&nbsp;<span class="glyphicon glyphicon-log-out"></span>&nbsp;
+				<span>{{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</span>
+			</a>
+		</li>
+
+	{% else %}
+		<li role="presentation">
+			<a role="menuitem" tabindex="-1" class="btn_link icin_btn" href="{{ path('fos_user_security_login') }}">
+				<span class="glyphicon glyphicon-user"></span> Войти
+			</a>
+		</li>
+		<li role="presentation">
+			<a role="menuitem" tabindex="-1" class="btn_link icin_btn" href="{{ path('fos_user_registration_register') }}">
+				<span class="glyphicon glyphicon-check"></span> Регистрация
+			</a>
+		</li>
+	{% endif %}
+	<li><h4>Участников</h4></li>
+	<li>
+		<a href="{{ path('home') }}" itemprop="name">
+			&nbsp;<span class="glyphicon glyphicon-home"></span>&nbsp;
+			<span>Дома</span>
+		</a>
+	</li>
+
+	<li>
+		<a href="{{ path('room') }}" itemprop="name">
+			&nbsp;<span class="glyphicon glyphicon-bed"></span>&nbsp;
+			<span>Комнаты</span>
+		</a>
+	</li>
+</ul>

@@ -1,0 +1,39 @@
+{% extends '::base.html.twig' %} 
+
+{% block title %}Список материалов{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+	$(function () {
+		$('.tree li:has(ul)').addClass('parent_li').find(' > .toggle_branch').attr('title', 'Свернуть ');
+
+		$('.tree li.parent_li > .branch .toggle_branch').on('click', function (e) {
+			var children = $(this).closest('li.parent_li').find(' > ul > li');
+			if (children.is(":visible")) {
+				children.hide();
+				$(this).attr('title', 'Развернуть').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+			} else {
+				children.show();
+				$(this).attr('title', 'Свернуть').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+			}
+			e.stopPropagation();
+		});
+
+	});
+</script>
+
+{% endblock %}
+
+{% block body %}
+	<div class="col-xs-12 center_content">
+		<div class="block-border plan">
+			<div class="col-lg-12">
+				{#----------Список планов----------------#}
+				<div class="tree">
+					{% include 'Top10CabinetBundle:Material:list.html.twig' with { 'item' : material } %}
+				</div>
+				{#----------/Список планов----------------#}
+			</div>
+		</div>
+	</div>
+{% endblock body %}

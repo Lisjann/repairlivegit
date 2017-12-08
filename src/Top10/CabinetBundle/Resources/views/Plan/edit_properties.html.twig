@@ -1,0 +1,747 @@
+{% if item|length > 0 %}
+	<ul>
+	{% for children in item %}
+		{% set PF = [] %}
+
+		{% if room.id is defined %}
+			{% for planforegin in room.planforegin %}
+				{% if planforegin.plan.id == children.id %}
+					{% set PF = PF|merge([planforegin]) %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+
+		{% if PF|length == 0 %}
+			{% set PF = [{ 
+				'id':null,
+				'value':null,
+				'name':null,
+				'link':null,
+				'quantity':null,
+				'price':null,
+				'priceworck':null,
+				'datebegin':null,
+				'dateend':null,
+				'finished':null,
+				'materialforegin':[{
+					'id': null,
+					'material': {
+						'name':null,
+						'code':null,
+						'image':null,
+					},
+					'value': null,
+					'name': null,
+					'link': null,
+					'quantity': null,
+					'price': null,
+					'measure': null
+				}],
+				'planforeginmeta':{
+					'daystobegin':null,
+					'daystoend':null,
+					'dayworck':null,
+					'daystobeginchild':null,
+					'daystoendchild':null,
+					'dayworckchild':null,
+					'countplanyes':null,
+					'countfinished':null,
+					'pricematerial':null,
+					'sumprice':null,
+					'sumpricefinished':null
+					}
+				}]
+			%}
+		{% endif %}
+
+		{% if children.type == 'caption' %}
+			<li class="caption">
+				{% if children.parent.id is defined %}<h4>{% else %}<h3>{% endif %}
+					{{children.name}}
+					{% if app.user and is_granted('ROLE_ADMIN') %}
+						<a  class="btn_link icin_btn metadata notext"
+							target="_blanck"
+							href="{{ path( 'plan_edit') }}?id={{children.id}}"
+							title="Редактировать пункт плана"
+						>
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+					{% endif %}
+				{% if children.parent.id is defined %}</h4>{% else %}</h3>{% endif %}
+				{% include 'Top10CabinetBundle:Plan:edit_properties.html.twig' with { 'item' : children.children } %}
+			</li>
+		{% endif %}
+
+		{% if children.type == 'checkbox' or children.type == 'tree' %}
+			{% for PFitem in PF %}
+				{% if PFitem.id %}
+					{% set PFid = PFitem.id %}
+				{% else %}
+					{% set PFid = 'NEW' %}
+				{% endif %}
+
+				<li {% if children.parent|length > 0 and children.parent.type != 'caption' %}style="display:none"{% endif %}>
+					<div class="branch panel panel-default">
+						<div class="panel-heading
+							{% if PFitem.finished == 'Y' and children.type == 'checkbox' %}
+								finished-heading
+							{% endif %}"
+						>
+							<div class="row">
+								<div class="col-xs-2">
+									{% if children.children|length > 0 %}
+										<span class="glyphicon glyphicon-plus toggle_branch"></span>
+									{% endif %}
+									{% if children.type == 'checkbox' %}
+										<input 
+											type="checkbox" 
+											id="{{'item_' ~ children.code}}" 
+											class="item"
+											name="plan[{{children.id}}][{{ PFid }}]"
+											value="Y"
+											{% if PFitem.value == 'Y' %}checked="checked"{% endif %} 
+										/>
+									{% endif %}
+									{% if children.type == 'checkbox' %}
+										<span class="glyphicon glyphicon-chevron-up toggle_properties collapsed" title="Дополнительные параметры" data-toggle="collapse" data-target="{{ '#properties' ~ children.id ~ '-' ~ loop.index }}"></span>
+									{% endif %}
+									{% if app.user and is_granted('ROLE_ADMIN') %}
+										<a  class="btn_link icin_btn atcaption metadata notext" 
+											target="_blanck"
+											href="{{ path( 'plan_edit') }}?id={{children.id}}"
+											title="Редактировать пункт плана"
+										>
+											<span class="glyphicon glyphicon-pencil"></span>
+										</a>
+									{% endif %}
+								</div>
+								<div class="col-xs-4">
+									<div class="row">
+										<span>{{ children.name }}
+											{% if children.children|length > 0 %}
+												{% if PFitem.planforeginmeta.countplanyes > 0 or PFitem.planforeginmeta.countfinished > 0 %}
+													{% set countall = PFitem.planforeginmeta.countplanyes + PFitem.planforeginmeta.countfinished %}
+													<span class="badge pull-right" title="Количество выбранных работ {{ countall }} из  {{ children.children|length }} в категории {{ children.name }} ">
+														{{ countall }}
+													</span>
+												{% endif %}
+											{% endif %}
+										</span> &nbsp;
+									</div>
+								</div>
+								<div class="col-xs-6 metadatas">
+									{% if children.children|length > 0 %}
+										{% if PFitem.planforeginmeta.countfinished > 0 %}
+											<span class="metadata finished" title="Колличество выполненых работ">
+												<span class="glyphicon glyphicon-ok"></span>{{ PFitem.planforeginmeta.countfinished }}
+											</span>&nbsp;
+										{% endif %}
+
+										{% if PFitem.planforeginmeta.daystobeginchild > 0 %}
+											<span 
+												class="metadata"
+												style="color:#428bca"
+												title='В категории "{{ children.name }}" ближайшая работа начнется через {{PFitem.planforeginmeta.daystobeginchild}} дня'
+											>
+												<span class="glyphicon glyphicon-calendar"></span>+{{PFitem.planforeginmeta.daystobeginchild}}
+											</span>
+										{% endif %}
+
+										{% if PFitem.planforeginmeta.daystobeginchild <= 0 and PFitem.planforeginmeta.daystobeginchild is not null and PFitem.planforeginmeta.daystoendchild >= 0 and PFitem.planforeginmeta.daystoendchild is not null %}
+											<span 
+												class="metadata"
+												style="color:#f0ad4e;"
+												title='В категории "{{ children.name }}" на сегодня заплонированны работы по ремонту и продлятся еще {{PFitem.planforeginmeta.daystoendchild}} дня'
+											>
+												<span class="glyphicon glyphicon-calendar"></span> в процессе
+											</span>&nbsp;
+										{% endif %}
+
+										{% if PFitem.planforeginmeta.daystoendchild < 0 %}
+											<span 
+												class="metadata"
+												style="color:#d9534f;"
+												title='В категории "{{ children.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+											>
+												<span class="glyphicon glyphicon-calendar"></span>{{ PFitem.planforeginmeta.daystoendchild }}
+											</span>&nbsp;
+										{% endif %}
+
+										{% if PFitem.planforeginmeta.dayworckchild is not null and PFitem.planforeginmeta.dayworckchild > 0 %}
+											<span class="metadata" title="Общее время на работу {{PFitem.planforeginmeta.dayworckchild}} дня">
+												<span class="glyphicon glyphicon-time"></span>{{PFitem.planforeginmeta.dayworckchild}}
+											</span>&nbsp;
+										{% endif %}
+
+										{% set sum = PFitem.planforeginmeta.sumprice + PFitem.planforeginmeta.sumpricefinished %}
+										{% if sum > 0 %}
+											<span class="metadata" title="Общая сумма {{ sum }} руб.">
+												<span class="glyphicon glyphicon-rub" ></span>{{ sum }}
+											</span>&nbsp;
+										{% endif %}
+									{% endif %}
+
+									{#--------------------------------Рассчет времени пункта плана-----------------------------------------#}
+									{% if children.type == 'checkbox' %}
+										{% if PFitem.finished == 'Y' %}
+												<span class="metadata finished" title="Работа выполнена">
+													<span class="glyphicon glyphicon-ok"></span>
+												</span>&nbsp;
+										{% else %}
+											{% if PFitem.planforeginmeta is defined %}
+											
+												{% if PFitem.planforeginmeta.daystobegin > 0 %}
+													<span 
+														class="metadata"
+														style="color:#428bca"
+														title='В категории "{{ children.name }}" Работа начнется через {{PFitem.planforeginmeta.daystobegin}} дня'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>+{{PFitem.planforeginmeta.daystobegin}}
+													</span>&nbsp;
+												{% endif %}
+
+												{% if PFitem.planforeginmeta.daystobegin <= 0 and PFitem.planforeginmeta.daystobegin is not null and PFitem.planforeginmeta.daystoend >= 0 and PFitem.planforeginmeta.daystoend is not null %}
+													<span 
+														class="metadata"
+														style="color:#f0ad4e;"
+														title='В категории "{{ children.name }}" на сегодня заплонированны работы по ремонту и продляться еще {{PFitem.planforeginmeta.daystoend}} дня'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>в процессе
+													</span>&nbsp;
+												{% endif %}
+												{% if PFitem.planforeginmeta.daystoend < 0 %}
+													<span 
+														class="metadata"
+														style="color:#d9534f;"
+														title='В категории "{{ children.name }}" есть невыполненые работы, выбирете пожалуста новые даты'
+													>
+														<span class="glyphicon glyphicon-calendar"></span>{{ PFitem.planforeginmeta.daystoend }}
+													</span>&nbsp;
+												{% endif %}
+											{% endif %}
+										{% endif %}
+
+										{% if PFitem.planforeginmeta.dayworck is not null and PFitem.planforeginmeta.dayworck > 0 %}
+											<span class="metadata" title="Общее время на работу {{PFitem.planforeginmeta.dayworck}} дня">
+												<span class="glyphicon glyphicon-time"></span> {{PFitem.planforeginmeta.dayworck}}
+											</span>&nbsp;
+										{% else %}
+											{% if children.worcktime != '' %}
+												<span class="metadata" title="Среднее время на работу {{children.worcktime}} дня">
+													<span class="glyphicon glyphicon-time"></span> {{children.worcktime}}
+												</span>&nbsp;
+											{% endif %}
+										{% endif %}
+
+									{% endif %}
+									{#--------------------------------/Рассчет времени пункта плана-----------------------------------------#}
+
+
+									{% if  PFitem.quantity > 0 or PFitem.planforeginmeta.pricematerial >0 or PFitem.priceworck >0 %}
+										{% set sum =  PFitem.quantity * PFitem.priceworck + PFitem.planforeginmeta.pricematerial %}
+										<span class="metadata" title="Cумма работ и материалов {{ sum }} руб.">
+											<span class="glyphicon glyphicon-rub" ></span> {{ sum }}
+										</span>&nbsp;
+									{% else %}
+										{% if children.pricematerial != '' %}
+											<span class="metadata" title="Средняя стоимость материалов {{children.pricematerial}} за {{children.pricematerialmeasure}}">
+												<span class="glyphicon glyphicon-rub" ></span> {{children.pricematerial}}
+											</span>&nbsp;
+										{% endif %}
+										{% if children.priceworck != '' %}
+											<span class="metadata" title="Средняя стоимость работ {{children.priceworck}} за {{children.priceworckmeasure}}">
+												<span class="glyphicon glyphicon-rub" ></span> {{children.priceworck}}
+											</span>&nbsp;
+										{% endif %}
+									{% endif %}
+
+									{% if children.complexity != '' %}
+										<span class="metadata" title="Cложность работ {{children.complexity}} из 5">
+											<span class="glyphicon glyphicon-education"></span> {{children.complexity}}/5
+										</span>&nbsp;
+									{% endif %}
+
+									{% set plus = children.plus|split(';') %}
+									{% set minus = children.minus|split(';') %}
+									{% set externallinks = children.externallinks|split(';') %}
+									{% set videolinks = children.videolinks|split(';') %}
+
+									{% if children.preview != null or children.plus != null or children.minus != null or children.externallinks != null or  children.videolinks != null %}
+										<span   class="question"
+												data-html="true"
+												data-container="body"
+												data-toggle="popover"
+												data-placement="bottom"
+												data-content='
+													<p><img class="img-responsive" src="{{ children.image }}"/></p>
+													<p>{{ children.preview }}</p>
+													{% if children.plus != null or children.minus != "" %}
+														<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#plusminus" target="_blank">Плюсы минусы</a></h4>
+														<div class="row">
+															<div class="col-xs-6">
+															{% for item in plus %}
+																{% if item != "" %}
+																	<p><span class="glyphicon glyphicon-plus"></span> {{ item }}</p>
+																{% endif %}
+															{% endfor %}
+															</div>
+															<div class="col-xs-6">
+															{% for item in minus %}
+																{% if item != "" %}
+																	<p><span class="glyphicon glyphicon-minus"></span> {{ item }}</p>
+																{% endif %}
+															{% endfor %}
+															</div>
+														</div>
+													{% endif %}
+
+													{% if externallinks|length > 1 %}
+														<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#externallinks" target="_blank">Ссылки на статьи</a></h4>
+														{#% for item in externallinks %}
+															{% set externallink = item|split("	") %}
+															{% if item != "" %}
+																<p class="externallinks">
+																	<a href="{{ externallink[0] }}" target="_blank">
+																		{% if externallink|length > 1 %}
+																			{{ externallink[1] }} {% else %} {{ externallink[0] }}
+																		{% endif %}
+																	</a>
+																</p>
+															{% endif %}
+														{% endfor %#}
+													{% endif %}
+
+													{% if videolinks|length > 1 %}
+														<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#videolinks" target="_blank">Видео</a></h4>
+														{#% for item in videolinks %}
+															{% if item != "" %}
+																<p>
+																	<iframe width="100%" src="{{ item }}" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
+																</p>
+															{% endif %}
+														{% endfor %#}
+													{% endif %}
+												'
+												data-original-title="<a href='{{ path('plan_show', { 'id':children.id, 'code':children.code }) }}' target='_blank'>{{ children.name }}</a>"
+										>
+											<strong>?</strong>
+										</span>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+
+						<div id="{{ 'properties' ~ children.id ~ '-' ~ loop.index }}" class="collapse panel-body properties form-horizontal">
+							{% if children.type == 'checkbox' %}
+
+								<div class="form-group">
+									<button 
+										class="btn_link icin_btn add_planforegin metadata" 
+										value="1" 
+										name="planforegin_add[{{ children.id }}]"
+										title="Добавить еще один пункт плана {{ children.name }}"
+										{% if PFitem.value != 'Y' %}style="display:none"{% endif %}
+									>
+										<span class="glyphicon glyphicon-plus"></span> Добавить еще {{ children.name }}
+									</button>
+									{% if PFitem.id %}
+										<a 
+											class="btn_link icin_btn metadata pull-right" 
+											onclick="if( !confirm('Уверены, что хотите удалить эту {{ children.name }}?') ) return false;"
+											href="{{ path("planforegin_delete", { "id":PFitem.id }) }}"
+											title="Удалить пунк плана {{ children.name }}"
+										>
+											<span class="glyphicon glyphicon-remove"></span> Удалить
+										</a>
+									{% endif %}
+								</div>
+
+								<div class="form-group">
+									<!--label for="form_description" class="col-sm-3 control-label">Фото</label-->
+									<div class="col-sm-12">
+										<div id="fine-uploader-gallery-{{ children.id }}-{{ loop.index }}" class="fine-uploader-gallery"></div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="form_description" class="col-sm-3 control-label">Наименование</label>
+									<div class="col-sm-9">
+										<input 
+											type="text" 
+											id="planforegin_name"
+											value="{{ PFitem.name }}"
+											name="planforegin_name[{{ children.id }}][{{ PFid }}]"
+											class="form-control"
+											{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+										/>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="form_description" class="col-sm-3 control-label">Ссылка</label>
+									<div class="col-sm-9">
+										<input 
+											type="text"
+											id="planforegin_link"
+											value="{{ PFitem.link }}"
+											name="planforegin_link[{{ children.id }}][{{ PFid }}]"
+											class="form-control"
+											{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+										/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="form_description" class="col-sm-3 control-label">кол-во</label>
+									<div class="col-sm-1">
+										<div class="row">
+											<input 
+												type="text"
+												id="planforegin_link"
+												value="{{ PFitem.quantity }}"
+												name="planforegin_quantity[{{ children.id }}][{{ PFid }}]"
+												class="form-control"
+												{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+											/> {{ children.priceworckmeasure }}
+										</div>
+									</div>
+									<!--label for="form_description" class="col-sm-2 control-label">Цена</label>
+									<div class="col-sm-2">
+										<div class="row">
+										<input 
+											type="text"
+											id="planforegin_link"
+											value="{{ PFitem.price }}"
+											name="planforegin_price[{{ children.id }}][{{ PFid }}]"
+											class="form-control"
+											{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+										/>
+										</div>
+									</div-->
+									<label for="form_description" class="col-sm-4 control-label"><div class="row">Цена работ</div></label>
+									<div class="col-sm-2">
+										<input 
+											type="text"
+											id="planforegin_link"
+											value="{{ PFitem.priceworck }}"
+											name="planforegin_priceworck[{{ children.id }}][{{ PFid }}]"
+											class="form-control"
+											{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+										/> р./{{ children.priceworckmeasure }}
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="datebegin" class="col-sm-3 control-label">Дата исполнения от:</label>
+
+									<div class="col-sm-4">
+										<div class="input-group date datebegin" id="o-datebegin-{{children.id}}-{{ loop.index }}">
+											<input 
+												type="text" 
+												{% if PFitem.datebegin is not null%}
+													value="{{ PFitem.datebegin|date('d.m.Y') }}"
+												{% endif %}
+												name="planforegin_datebegin[{{ children.id }}][{{ PFid }}]" 
+												class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+											/>
+											<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div>
+									</div>
+
+									<label for="dateend" class="col-sm-1 control-label">до:</label>
+
+									<div class="col-sm-4">
+										<div class="input-group date dateend" id="o-dateend-{{children.id}}-{{ loop.index }}">
+											<input 
+												type="text"
+												{% if PFitem.dateend is not null%}
+													value="{{ PFitem.dateend|date('d.m.Y') }}"
+												{% endif %}
+												name="planforegin_dateend[{{ children.id }}][{{ PFid }}]" 
+												class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+											/>
+											<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+
+
+
+<div class="form-group">
+	<div class="col-sm-12">
+		<h4>Стройматериалы</h4>
+	</div>
+</div>
+
+<div id="materiallist{{ children.id }}_{{ PFid }}">
+	<div class="col-xs-2"><label class="control-label">вид</label></div>
+	<div class="col-xs-6"><label class="control-label">название/ссылка</label></div>
+	<div class="col-xs-2"><label class="control-label metadata" title="Колличество/ еденицы измерения">кол./ед. изм.</label></div>
+	<div class="col-xs-2"><label class="control-label metadata" title="цена за еденицу измерения">цена за ед.</label></div>
+
+	{% if PFid != 'NEW' and PFitem.materialforegin|length > 0 %}
+		{% for materialforegin in PFitem.materialforegin %}
+			<div class="form-group material">
+				<div class="col-xs-2">
+					{{ materialforegin.material.name }}
+				</div>
+				<div class="col-xs-6">
+					<input 
+						type="text"
+						{% if materialforegin.name is not null%}
+							value="{{ materialforegin.name }}"
+						{% endif %}
+						name="materialforegin[{{ children.id }}][{{ materialforegin.id }}][name]" 
+						class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+					/>
+					<input 
+						type="text"
+						{% if materialforegin.link is not null%}
+							value="{{ materialforegin.link }}"
+						{% endif %}
+						name="materialforegin[{{ children.id }}][{{ materialforegin.id }}][link]" 
+						class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+					/>
+				</div>
+				<div class="col-xs-2">
+					<input 
+						type="text"
+						{% if materialforegin.quantity is not null%}
+							value="{{ materialforegin.quantity }}"
+						{% endif %}
+						name="materialforegin[{{ children.id }}][{{ materialforegin.id }}][quantity]" 
+						class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+					/>
+					<input 
+						type="text"
+						{% if materialforegin.measure is not null%}
+							value="{{ materialforegin.measure }}"
+						{% endif %}
+						name="materialforegin[{{ children.id }}][{{ materialforegin.id }}][measure]" 
+						class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+					/>
+				</div>
+				<div class="col-xs-2">
+					<input 
+						type="text"
+						{% if materialforegin.price is not null%}
+							value="{{ materialforegin.price }}"
+						{% endif %}
+						name="materialforegin[{{ children.id }}][{{ materialforegin.id }}][price]" 
+						class="form-control{% if PFitem.value != 'Y' %} disabled{% endif %}"
+					/> руб.
+
+					<a 
+						title="Удалить стройматериал из плана"
+						class="btn_link icin_btn metadata notext" 
+						onclick="if( !confirm('Уверены, что хотите удалить стройматериал {{ children.name }}?') ) return false;"
+						href="{{ path("materialforegin_delete", { "id":materialforegin.id }) }}"
+					>
+						<span class="glyphicon glyphicon-remove"></span>
+					</a>
+
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
+</div>
+
+<div class="form-group">
+	<div class="col-sm-12" style="text-align:right">
+		<a 
+			class="btn_link icin_btn add_material metadata" 
+			href="{{ path('material_planforegin', { 'plan_id':children.id, 'planforegin_id': PFid }) }}"
+			title="Добавить еще строматериал"
+			data-toggle="lightbox" 
+			data-gallery="example-material"
+			data-width="1000"
+			data-title='Выбирете стройматериалы'
+			data-footer='<button 
+							type="submit"
+							id="choose-material" 
+							class="btn btn-danger"
+							data-dismiss="modal"
+							aria-label="Close"
+						>
+							Выбрать
+						</button>'
+			{% if PFitem.value != 'Y' %}style="display:none"{% endif %}
+		>
+			<span class="glyphicon glyphicon-plus"></span> Добавить
+		</a>
+	</div>
+</div>
+
+
+							{% if children.planproperties|length > 0 %}	
+								<div class="form-group">
+									<div class="col-sm-12">
+										<h4>Характеристики</h4>
+									</div>
+								</div>
+
+								{% for planproperties in children.planproperties %}
+									{% set val = null %}
+									{% set properties = planproperties.properties %}
+
+									{% for propertiesforegin in properties.propertiesforegin %}
+										{% if propertiesforegin.planforegin.rooms.id == room.id %}
+											{% if propertiesforegin.planforegin.plan.id == children.id %}
+												{% set val = propertiesforegin.value %}
+											{% endif %}
+										{% endif %}
+									{% endfor %}
+
+									{% if properties.type == 'number' or properties.type == 'text' or properties.type == 'checkbox'%}
+										<div class="form-group">
+											<label for="form_description" class="col-sm-3 control-label">{{ properties.name }}</label>
+											<div class="col-sm-9">
+												{% if properties.type == 'number' or properties.type == 'text'%}
+													<input 
+														type="{{properties.type}}" 
+														id="{{'plan_' ~ properties.code}}" 
+														value="{{ val }}"
+														name="properties[{{ children.id }}][{{ properties.id }}][{{ PFid }}]"
+														class="form-control"
+														{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+													/>
+													{{properties.measure}}
+												{% elseif properties.type == 'checkbox' %}
+													<input 
+														type="{{properties.type}}" 
+														id="{{'plan_' ~ properties.code}}" 
+														value="Y"
+														{% if val == 'Y' %}checked="checked"{% endif %} 
+														name="properties[{{ children.id }}][{{ properties.id }}][{{ PFid }}]"
+														{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+													/>
+												{% endif %}
+											</div>
+										</div>
+									{% endif %}
+
+									{% if properties.type == 'choices' %}
+										{% if properties.propertiestypelist %}
+											<div class="form-group">
+												<label for="form_description" class="col-sm-3 control-label">{{ properties.name }}</label>
+												<div class="col-sm-9">
+													<select 
+														id="{{'item_' ~ properties.code}}"
+														name="properties[{{ children.id }}][{{properties.id}}][{{ PFid }}]" 
+														class="form-control"
+														{% if PFitem.value != 'Y' %}disabled="disabled"{% endif %}
+													>
+														{% for propertiestypelist in properties.propertiestypelist %}
+															<option value="{{propertiestypelist.value}}" {% if propertiestypelist.value == val %}selected="selected"{% endif %} >{{propertiestypelist.value}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										{% endif %}
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						</div> 
+					</div>
+
+					{% include 'Top10CabinetBundle:Plan:edit_properties.html.twig' with { 'item' : children.children } %}
+
+					{% if children.type == 'checkbox' %}
+						<script type="text/javascript">
+							var uploader = $('#fine-uploader-gallery-{{children.id}}-{{ loop.index }}').fineUploader({
+								debug: false, //включаем дебаг в консоль браузера. 
+								{% if PFitem.id != null %}
+									session : {
+										endpoint : "{{ path( 'planforegin_uploadlist', {'id':PFitem.id} ) }}",
+									},
+								{% endif %}
+								template: 'qq-template-gallery',
+								request: {
+									{% if PFitem.id != null %}
+										endpoint: "{{ path( 'planforegin_upload', {'id':PFitem.id} ) }}",
+									{% else %}
+										endpoint: "{{ path( 'planforegin_upload', {'id':'planforegin-' ~ room.id ~ '-' ~ children.id } ) }}",
+									{% endif %}
+									//forceMultipart: false,
+									inputName: 'qqfiles', //имя инпут поля типа file
+									/*params: {
+										action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+									}*/
+								},
+								thumbnails: {
+									placeholders: {
+										waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+										notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+									}
+								},
+								
+								resume: {
+									enabled: true
+								},
+								deleteFile: {
+									enabled: true,
+									method: "POST",
+									{% if PFitem.id != null %}
+										endpoint: "{{ path( 'planforegin_upload', {'id':PFitem.id} ) }}"
+									{% else %}
+										endpoint: "{{ path( 'planforegin_upload', {'id':'planforegin-' ~ room.id ~ '-' ~ children.id } ) }}"
+									{% endif %}
+								},
+								validation: {
+									allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+									sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+									itemLimit: 10 //максимальное количество файлов для текущего подключения плагина
+								},
+								/*dragAndDrop: {
+									disableDefaultDropzone: true //отключаем дроп-зону
+								},*/
+								messages: { //русифицируем некоторые сообщения и кнопки
+									typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+									sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+									//tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+								},
+								text: {
+									fileInputTitle: 'Добавить изображение',
+									uploadButton: 'Прикрепить файлы',
+									failUpload: 'Не закачан!'
+								}
+							});
+
+							//-----------------------ПОДКЛЮЧЕНИЕ К ПОЛЯМ ВВОДА ДАТЫ КАЛЕНДАРЯ----------
+							$(function () {
+								$('#o-datebegin-{{children.id}}-{{ loop.index }}').datetimepicker({
+									pickTime: false,
+									language: 'ru',
+									{% if PFitem.dateend is defined %}maxDate: moment('{{ PFitem.dateend|date("d.m.Y") }}',"DD-MM-YYYY"){% endif %}
+								});
+
+								$('#o-dateend-{{children.id}}-{{ loop.index }}').datetimepicker({
+									pickTime: false,
+									language: 'ru',
+									{% if PFitem.datebegin is defined %}minDate: moment('{{ PFitem.datebegin|date("d.m.Y") }}',"DD-MM-YYYY"){% endif %}
+								});
+
+								//При изменении даты в o-datebegin, она устанавливается как минимальная для o-dateend
+								$("#o-datebegin-{{children.id}}-{{ loop.index }}").on("dp.change",function (e) {
+									$("#o-dateend-{{children.id}}-{{ loop.index }}").data("DateTimePicker").setMinDate(e.date);
+								});
+								//При изменении даты в o-dateend, она устанавливается как максимальная для o-datebegin
+								$("#o-dateend-{{children.id}}-{{ loop.index }}").on("dp.change",function (e) {
+									$("#o-datebegin-{{children.id}}-{{ loop.index }}").data("DateTimePicker").setMaxDate(e.date);
+								});
+							})
+							
+							//-----------------------/ПОДКЛЮЧЕНИЕ К ПОЛЯМ ВВОДА ДАТЫ КАЛЕНДАРЯ----------
+						</script>
+					{% endif %}
+				</li>
+			{% endfor %}
+		{% endif %}
+		
+	{% endfor %}
+	</ul>
+{% endif %}

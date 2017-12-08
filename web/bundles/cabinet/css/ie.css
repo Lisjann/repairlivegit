@@ -1,0 +1,17 @@
+/*For IE9, IE8*/
+
+img{border:none;}
+
+.component-fullwidth{display:none;}
+
+.post_main .dark 
+{
+height:40%;
+background-color:#bbbbbb;
+}
+.post_main_small .dark{
+height:30%;
+background-color:#bbbbbb;
+}
+
+.post_main, .post_main_small a{ text-decoration:none;}

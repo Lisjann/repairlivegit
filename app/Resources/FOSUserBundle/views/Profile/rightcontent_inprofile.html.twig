@@ -1,0 +1,34 @@
+{# src/top10/CabinetBundle/Resources/views/Author/leftcontent.html.twig #}
+{% set userlogin = app.security.getToken().getUser() %}
+<h3 class="red_line profile">
+	{% if user != 'anon.' %}
+		<a href="{{ path( 'fos_user_profile_show' ) }}">
+			{% if user.avatar %}
+				<img src="{{ user.avatar|imagine_filter('userpic') }}" class="userpic" alt=""/>
+			{% else %}
+				<div class="userpic">{{ user|slice(0, 2)|upper }}</div>
+			{% endif %}
+		</a>
+		<a href="{{ path( 'fos_user_profile_show' ) }}">
+			{{ user }}
+		</a>
+	{% else %}Мой профиль{% endif %}
+</h3>
+<div class="block author panel-body">
+	{% if user != 'anon.' %}
+		{% if user.avatar %}
+			<img src="{{ user.avatar }}" class="author_portrait img-responsive" alt=""/>
+		{% endif %}
+			<p>
+				{#app.security.getToken().getUser().getMessage()#}
+				{#author.message#}
+			</p>
+	{% endif %}
+
+	<ul class="nav nav-pills nav">
+		{% if user != 'anon.' and userlogin == user %}
+			<li><a class="btn_link" href="{{ path('fos_user_profile_edit') }}">Редактировать профиль</a></li>
+			<li><a class="btn_link" href="{{ path('fos_user_security_logout') }}">{{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</a></li>
+		{% endif %}
+	</ul>
+</div>

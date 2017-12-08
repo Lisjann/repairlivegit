@@ -1,0 +1,150 @@
+{% extends '::basenoright.html.twig' %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Создать план ремонта{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+
+{% block javascript %}
+<script type="text/javascript">
+	$(function () {
+		$('.tree li:has(ul)').addClass('parent_li').find(' > .toggle_branch').attr('title', 'Свернуть ');
+
+		/*делаем не активные/активные параметры плана при выборе/невыборе чекбокса плана*/
+		$('.item').change( function() {
+			if( $(this).prop("checked") ){
+				$(this).closest('.branch').find('.panel-body input').prop("disabled", false);
+				$(this).closest('.branch').find('.panel-body .add_material').show();
+				$(this).closest('.branch').find('.panel-body .add_planforegin').show();
+			}
+			else{
+				$(this).closest('.branch').find('.panel-body input').prop('disabled',true );
+				$(this).closest('.branch').find('.panel-body .add_material').hide();
+				$(this).closest('.branch').find('.panel-body .add_planforegin').hide();
+			}
+		});
+		/*делаем не активные/активные параметры плана при выборе/невыборе чекбокса плана*/
+
+		$('.tree li.parent_li > .branch .toggle_branch').on('click', function (e) {
+			var children = $(this).closest('li.parent_li').find(' > ul > li');
+			if (children.is(":visible")) {
+				children.hide();
+				$(this).attr('title', 'Развернуть').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+			} else {
+				children.show();
+				$(this).attr('title', 'Свернуть').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+			}
+			e.stopPropagation();
+		});
+
+		$('.metadata, .plan .badge').tooltip();
+		$('.question').popover();
+
+		$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+			event.preventDefault();
+			$(this).ekkoLightbox({
+				alwaysShowClose: true
+			})
+		});
+
+
+		//------------вставляем новые выбрвнные из модального окна inputы для Материалов Плана-------------------/
+		$(document).on ( 'click', '#choose-material', function(){
+			$('.material[type=checkbox]:checked').each(function(indx){
+				$('#materiallist' + $(this).attr('plan-id') + '_' + $(this).attr('planforegin-id') ).append('<div class="form-group material"><div class="col-xs-2">' + $(this).attr("material-name") + '</div><div class="col-xs-6"><input type="text" name="materialforegin_new['+ $(this).attr('plan-id') +'][' + $(this).attr('planforegin-id') + '][' + $(this).attr("material-id") + '][name]" class="form-control"/><input type="text" name="materialforegin_new['+ $(this).attr('plan-id') +'][' + $(this).attr('planforegin-id') + '][' + $(this).attr("material-id") + '][link]" class="form-control"/></div><div class="col-xs-2"><input type="text" name="materialforegin_new['+ $(this).attr('plan-id') +'][' + $(this).attr('planforegin-id') + '][' + $(this).attr("material-id") + '][quantity]" class="form-control"/> <input type="text" name="materialforegin_new['+ $(this).attr('plan-id') +'][' + $(this).attr('planforegin-id') + '][' + $(this).attr("material-id") + '][measure]" class="form-control"/></div><div class="col-xs-2"><input type="text" name="materialforegin_new['+ $(this).attr('plan-id') +'][' + $(this).attr('planforegin-id') + '][' + $(this).attr("material-id") + '][price]" class="form-control"/> руб.</div></div>');
+			});
+		});
+
+	});
+</script>
+
+	{% include 'Top10CabinetBundle:Plan:fineuploader.html.twig' %}
+{% endblock %}
+
+{% block body %}
+	<div class="col-sm-12 center_content">
+		{% set url = path('plan_add', { 'room_id':room.id })  %}
+		{% set returnHome = '<a class="btn btn-default" href="' ~ path('room_show', { 'id':room.id, 'code':room.code }) ~ '">Отмена</a>' %}
+
+		<div class="block-border">
+			<h3 style="margin-top:0">Процент выполнения ремонта</h3>
+			<div class="col-lg-12">
+				<div class="progress">
+					<div
+						class="progress-bar 
+						{% if planIndication.procentWorck < 33 %}
+							progress-bar-info
+						{% elseif planIndication.procentWorck >= 33 and planIndication.procentWorck < 66 %}
+							progress-bar-warning
+						{% elseif planIndication.procentWorck >= 66 %}
+							progress-bar-success
+						{% endif %}"
+						role="progressbar"
+						aria-valuenow="{{ planIndication.procentWorck }}" 
+						aria-valuemin="0"
+						aria-valuemax="100" 
+						style="width: {{ planIndication.procentWorck }}%;"
+					>
+						<span style="color:#2a2323;padding:0 10px">{{ planIndication.procentWorck }}%</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				{% set pricePricesWorkSum =  planIndication.pricesum + planIndication.priceworcksum %}
+				<label for="datebegin" class="col-sm-2 control-label">Весь ремонт:</label>
+				<div class="col-sm-2">
+					<span class="metadata indication" title="Стоимость всего ремонта {{ pricePricesWorkSum }} руб.">
+						<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSum }}
+					</span>
+				</div>
+
+				{% set pricePricesWorkSumFinished =  planIndication.pricesumFinished + planIndication.priceworcksumFinished %}
+				<label for="datebegin" class="col-sm-2 control-label">Потрачено:</label>
+				<div class="col-sm-2">
+					<span class="metadata indication" title="Стоимость уже завершонных пунктов {{ pricePricesWorkSumFinished }} руб.">
+						<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSumFinished }}
+					</span>
+				</div>
+
+				{% set pricePricesWorkSumNoFinished =  pricePricesWorkSum - pricePricesWorkSumFinished %}
+				<label for="datebegin" class="col-sm-2 control-label">Осталось:</label>
+				<div class="col-sm-2">
+					<span class="metadata indication" title="Стоимость еще не выполненых пунктов {{ pricePricesWorkSumNoFinished }} руб.">
+						<span class="glyphicon glyphicon-rub" ></span>{{ pricePricesWorkSumNoFinished }}
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="block-border plan">
+			<div class="col-lg-12">
+				<form action="{{url}}" method="POST" role="form" >
+
+					{#----------Свойства дома Самопальная форма----------------#}
+					<div class="tree">
+						{% include 'Top10CabinetBundle:Plan:edit_properties.html.twig' with { 'item' : plan } %}
+					</div>
+					{#----------/Свойства дома Самопальная форма----------------#}
+
+					<div class="form-group">
+						<button type="submit" class="btn btn-danger">Сохранить</button>
+						{{ returnHome| raw }}
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	$(function () {
+		//Неактивные инпуты даты делаем скриптом после загрузки всех Скриптов так как плагин календаря datetimepicker не работает если поставить параметр у инпута сразу
+		$('input.disabled').prop("disabled", true);
+	});
+</script>
+{% endblock body %}
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}{% endblock javascriptSlide %}

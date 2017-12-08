@@ -1,0 +1,13 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block fos_user_content %}
+    <div class="alert alert-success">
+		{{ 'registration.confirmed'|trans({'%username%': '<a href="' ~ path( 'fos_user_profile_show' ) ~ '">' ~ user.username ~ '</a>'}, 'FOSUserBundle')|raw }} Теперь вы можете создать страницу вашего Дома <a class="btn_link icin_btn" href="{{ path('home_add') }}"><span class="glyphicon glyphicon-plus"></span> Добавить Дом</a>, после чего отдельно и для комнат. Также вы можете вести <a href="{{ path('room_show', { 'id':'1', 'code':'kukhnia-v-smeshannom-stile-eclektiki', 'order[date]':'DESC' }) }}#postslist" target="_blanck">Домовой журнал</a> рассказывая о событиях, случившихся в Доме за последнее время. Теперь вы можете ставить лайки, оставлять комментарии у домов, комнат и статей других участников сообщества.
+	</div>
+    {% if app.session is not empty %}
+        {% set targetUrl = app.session.get('_security.' ~ app.security.token.providerKey ~ '.target_path') %}
+        {% if targetUrl is not empty %}
+			<p><a href="{{ targetUrl }}">{{ 'registration.back'|trans({}, 'FOSUserBundle') }}</a></p>
+		{% endif %}
+    {% endif %}
+{% endblock fos_user_content %}

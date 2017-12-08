@@ -1,0 +1,61 @@
+parameters:
+    top10_cabinet.emails.manager: admin@repairlive.ru
+    top10_cabinet.emails.default: lisjann@mail.ru
+    top10_cabinet.status_default: 1
+    top10_cabinet.day_live: 30
+    top10_cabinet.day_live_order_files: 7
+
+services:
+    top10_user.registration.form.type:
+        class: Top10\CabinetBundle\Form\Type\RegistrationFormType
+        arguments: [%fos_user.model.user.class%]
+        tags:
+            - { name: form.type, alias: top10_user_registration }
+
+    cabinet.json_import:
+        class: Top10\CabinetBundle\Service\JsonImport
+        arguments: [@kernel, @logger]
+        tags:
+            - { name: monolog.logger, channel: import }
+
+    cabinet.post_search:
+        class: Top10\CabinetBundle\Service\PostSearch
+        arguments: [@service_container]
+
+    cabinet.plan_servis:
+        class: Top10\CabinetBundle\Service\PlanServis
+        arguments: [@service_container]
+
+    cabinet.security_role:
+        class: Top10\CabinetBundle\Service\SecurityRole
+        arguments: [@service_container]
+
+    cabinet.tags:
+        class: Top10\CabinetBundle\Service\Tags
+        arguments: [@service_container]
+
+    cabinet.fine_upload:
+        class: Top10\CabinetBundle\Service\FineUploadHandler
+        arguments: [@service_container]
+
+    cabinet.translate_char:
+        class: Top10\CabinetBundle\Service\TranslateChar
+        arguments: [@service_container]
+
+    cabinet.slides_list:
+        class: Top10\CabinetBundle\Service\SlidesList
+        arguments: [@service_container]
+
+    cabinet.catalog_search:
+        class: Top10\CabinetBundle\Service\CatalogSearch
+        arguments: [@service_container]
+
+    cabinet.cart_manager:
+        class: Top10\CabinetBundle\Service\CartManager
+        arguments: [@security.context,@doctrine.orm.entity_manager ]
+
+    cabinet.product_import:
+        class: Top10\CabinetBundle\Service\ProductImport
+        arguments: [@service_container, @doctrine.orm.entity_manager, %product_import%, @logger ]
+        tags:
+            - { name: monolog.logger, channel: import }

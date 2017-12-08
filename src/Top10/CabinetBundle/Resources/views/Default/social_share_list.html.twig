@@ -1,0 +1,24 @@
+<div class="block_social">
+		{% if is_granted('ROLE_ADMIN') is empty  %}
+		<!--a href="#" class="social_likes"></a-->
+		<script type="text/javascript">(function() {
+		if (window.pluso)if (typeof window.pluso.start == "function") return;
+		if (window.ifpluso==undefined) { window.ifpluso = 1;
+			var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+			s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+			s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+			var h=d[g]('body')[0];
+			h.appendChild(s);
+		}})();
+		</script>
+		<div class="pluso" 
+			data-background="none;"
+			data-options="medium,round,line,horizontal,nocounter,theme=04"
+			data-services="vkontakte,odnoklassniki,facebook,pinterest"
+			data-url="{{ app.request.scheme ~'://' ~ app.request.httpHost ~ path( path_show, { 'id':object.id, 'code':object.code }) }}"
+			data-title="{{object.name}}"
+		></div>
+		{% else %}
+			<a class="btn_link" target="_blanck" href="{{ path( path_edit, { 'id':object.id }) }}">редактировать</a>
+		{% endif %}
+</div>

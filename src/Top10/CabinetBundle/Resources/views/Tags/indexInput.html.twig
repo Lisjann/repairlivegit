@@ -1,0 +1,17 @@
+{# src/top10/CabinetBundle/Resources/views/Tags/index.html.twig #}
+
+<h3 class="red_line">Выбрать теги</h3>
+<div class="block block-border tag panel-body">
+	{% for tagspop in tags %}
+		<p>
+			<input 
+				type="checkbox" 
+				id="form_interesting" 
+				name="tagspop[]" 
+				{% if tagspop.checked is defined and tagspop.checked > 0 %}checked="checked"{% endif %} 
+				value="{{ tagspop.id }}"
+			/>
+			<a target="_blanck" class="active" href="{{ path( 'post_tag', {'tag_code':tagspop.code} ) }}">{{ tagspop.name }}</a>
+		</p>
+	{% endfor %}
+</div>

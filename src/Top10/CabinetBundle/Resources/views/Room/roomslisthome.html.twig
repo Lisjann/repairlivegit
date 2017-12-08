@@ -1,0 +1,42 @@
+{% if rooms|length > 0 %}
+	<div class="col-sm-9 col-xs-12 rooms block-border">
+		{% for room in rooms %}
+			<div class="col-sm-6 col-md-6">
+				<div class="room {% if room.approved == 0 %}notapproved{% endif %}">
+					{% if room.slides|length > 0 %}
+						<div class="xs-row-left-right">
+							<a class="img_link" href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}">
+								<img src="{{ room.slides|first.image|imagine_filter('roomhome') }}"/>
+							</a>
+						</div>
+					{% endif %}
+					<h2>
+						<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}">{% if room.roomstype|length > 0  %} {{ room.roomstype.name }}. {% endif %}{{room.name}}</a>
+					</h2>
+					<table class="meta" style="margin-bottom:0;">
+						<tr>
+							<td class="date"><time datetime="{{room.created|date('Y-m-d')}}">{{room.created|date('d.m.Y')}}</time></td>
+							<td class="likes">
+								<div class="likes_icon">
+									<span class="glyphicon glyphicon-heart"></span>
+								</div>
+								<div class="likes_count">{{ room.likes|length }}</div>
+							</td>
+							<td class="comment_count">
+								<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}#comments">
+									{% if room.comments|length > 0 %}
+										<span>{{ room.comments|length }}</span>
+									{% else %}
+										...
+									{% endif %}
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% else %}
+	<p>Ничего не найдено</p>
+{% endif %}

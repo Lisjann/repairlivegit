@@ -1,0 +1,47 @@
+<div class="row">
+	<div class="col-lg-12">
+		<h1 class="breadcrumb">Регистрация</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12 col-xs-12 left_content">
+		<div class="block-border">
+			<div class="col-lg-12">
+				{{ form_errors(registerForm) }}
+
+				<form action="{{ path('fos_user_registration_register') }}" class="login" {{ form_enctype(registerForm) }} method="post" >
+					<div class="form-group">
+						{{ form_label(registerForm.username) }}
+						{{ form_errors(registerForm.username) }}
+						{{ form_widget(registerForm.username, {'attr': {'class': 'form-control'} }) }}
+					</div>
+
+					<div class="form-group">
+						{{ form_label(registerForm.email) }}
+						{{ form_errors(registerForm.email) }}
+						{{ form_widget(registerForm.email, {'attr': {'class': 'form-control', 'type':'email'}}) }}
+					</div>
+
+					<div class="form-group">
+						{# form_widget(registerForm.plainPassword, {'attr': {'type':'password'}}) #}
+
+						{{ form_label(registerForm.plainPassword.first) }}
+						{{ form_widget(registerForm.plainPassword.first,{'attr':{'class':'form-control'}}) }}
+
+						{{ form_label(registerForm.plainPassword.second) }}
+						{{ form_widget(registerForm.plainPassword.second,{'attr':{'class':'form-control'}}) }}
+
+
+						{{ form_widget(registerForm._token) }}
+						{{ form_rest(registerForm) }}
+					</div>
+
+					<div class="form-group">
+						<button type="submit" class="btn btn-danger">Зарегистрироваться</button>
+						<!--p><b>Поля, отмеченные * , обязательны для заполнения</b></p-->
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

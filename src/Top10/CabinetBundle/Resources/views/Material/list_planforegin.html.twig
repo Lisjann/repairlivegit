@@ -1,0 +1,115 @@
+{% if item is defined %}
+	<ul>
+	{% for children in item %}
+	{% if children.type == 'caption' %}
+			<li class="caption">
+				{% if children.parent.id is defined %}<h3>{% else %}<h2>{% endif %}
+					{{children.name}}
+				{% if children.parent.id is defined %}</h3>{% else %}</h2>{% endif %}
+
+				{% include 'Top10CabinetBundle:Material:list_planforegin.html.twig' with { 'item' : children.children } %}
+			</li>
+		{% endif %}
+
+		{% if children.type == 'checkbox' or children.type == 'tree' %}
+			<li {% if children.parent|length > 0 and children.parent.type != 'caption' %}style="display:none"{% endif %}>
+				<div class="branch panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-2">
+								{% if children.children|length > 0 %}
+									<span class="glyphicon glyphicon-plus toggle_branch"></span>
+								{% endif %}
+								{% if children.type == 'checkbox' %}
+									<input 
+										type="checkbox" 
+										id="{{'item_' ~ children.code}}" 
+										class="item material"
+										name="material[{{ children.id }}]"
+										plan-id="{{ plan_id }}"
+										planforegin-id="{{ planforegin_id }}"
+										material-id="{{ children.id }}"
+										material-name="{{ children.name }}"
+										value="{{ children.id }}"
+									/>
+								{% endif %}
+							</div>
+							<div class="col-xs-4">
+								<div class="row">
+									<span>{{ children.name }}</span> &nbsp;
+								</div>
+							</div>
+							<div class="col-xs-6 metadatas">
+								{% if children.pricematerial != '' %}
+									<span class="metadata" title="Средняя стоимость материалов {{children.pricematerial}} за {{children.pricematerialmeasure}}">
+										<span class="glyphicon glyphicon-rub" ></span> {{children.pricematerial}}
+									</span>&nbsp;
+								{% endif %}
+
+								{% if children.complexity != '' %}
+									<span class="metadata" title="Cложность работ {{children.complexity}} из 5">
+										<span class="glyphicon glyphicon-education"></span> {{children.complexity}}/5
+									</span>&nbsp;
+								{% endif %}
+
+								{% set plus = children.plus|split(';') %}
+								{% set minus = children.minus|split(';') %}
+								{% set externallinks = children.externallinks|split(';') %}
+								{% set videolinks = children.videolinks|split(';') %}
+
+								{% if children.preview != null or children.plus != null or children.minus != null or children.externallinks != null or  children.videolinks != null %}
+									<span   class="question"
+											data-html="true"
+											data-container="body"
+											data-toggle="popover"
+											data-placement="bottom"
+											data-content='
+												<p><img class="img-responsive" src="{{ children.image }}"/></p>
+												<p>{{ children.preview }}</p>
+												{% if children.plus != null or children.minus != "" %}
+													<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#plusminus" target="_blank">Плюсы минусы</a></h4>
+													<div class="row">
+														<div class="col-xs-6">
+														{% for item in plus %}
+															{% if item != "" %}
+																<p><span class="glyphicon glyphicon-plus"></span> {{ item }}</p>
+															{% endif %}
+														{% endfor %}
+														</div>
+														<div class="col-xs-6">
+														{% for item in minus %}
+															{% if item != "" %}
+																<p><span class="glyphicon glyphicon-minus"></span> {{ item }}</p>
+															{% endif %}
+														{% endfor %}
+														</div>
+													</div>
+												{% endif %}
+
+												{% if externallinks|length > 1 %}
+													<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#externallinks" target="_blank">Ссылки на статьи</a></h4>
+												{% endif %}
+
+												{% if videolinks|length > 1 %}
+													<h4><a href="{{ path("plan_show", { "id":children.id, "code":children.code }) }}#videolinks" target="_blank">Видео</a></h4>
+												{% endif %}
+											'
+											data-original-title="<a href='{{ path('plan_show', { 'id':children.id, 'code':children.code }) }}' target='_blank'>{{ children.name }}</a>"
+									>
+										<strong>?</strong>
+									</span>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{% include 'Top10CabinetBundle:Material:list_planforegin.html.twig' with { 'item' : children.children } %}
+
+			</li>
+
+		{% endif %}
+		
+	{% endfor %}
+	</ul>
+{% endif %}

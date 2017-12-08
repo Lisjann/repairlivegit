@@ -1,0 +1,54 @@
+{% if rooms|length > 0 %}
+	<div class="rooms">
+		{% for room in rooms %}
+			<div class="room block-border {% if room.approved == 0 %}notapproved{% endif %}">
+				<div class="col-lg-12">
+					{% if room.slides|length > 0 %}
+						<div class="xs-row-top-left-right">
+							<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}">
+								<img src="{{ room.slides|first.image|imagine_filter('roomhome') }}"/>
+							</a>
+						</div>
+					{% endif %}
+					<h2>
+						<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}">{% if room.roomstype|length > 0  %} {{ room.roomstype.name }}. {% endif %}{{room.name}}</a>
+					</h2>
+					<table class="meta">
+						<tr>
+							<td class="date"><time datetime="{{room.created|date('Y-m-d')}}">{{room.created|date('d.m.Y')}}</time></td>
+							<td class="author"><a href="{{ path('user_show', {'username': room.author.username }) }}">{{room.author.username}}</a></td>
+							<td class="likes">
+								<div class="likes_icon">
+									<span class="glyphicon glyphicon-heart"></span>
+								</div>
+								<div class="likes_count">{{ room.likes|length }}</div>
+							</td>
+							<td class="comment_count">
+								<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}#comments">
+									{% if room.comments|length > 0 %}
+										<span>{{ room.comments|length }}</span> <span class="hidden-xs">комментария</span>
+									{% else %}
+										<span class="hidden-xs">комментировать...</span> <span class="visible-xs">...</span>
+									{% endif %}
+								</a>
+							</td>
+						</tr>
+					</table>
+
+					{% include 'Top10CabinetBundle:Default:social_share_list.html.twig' with {
+						'path_edit' : 'room_edit',
+						'path_show' : 'room_show',
+						'object' : room,
+						}
+					%}
+			</div>
+			</div>
+		{% endfor %}
+	</div>
+
+	{# display navigation #}
+	{{ knp_pagination_render(rooms, null, {}, {'alignment': 'right'}) }}
+
+{% else %}
+	<p>Ничего не найдено</p>
+{% endif %}

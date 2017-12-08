@@ -1,0 +1,269 @@
+{% extends '::basenoright.html.twig' %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}Создать план ремонта{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+
+{% block javascript %}
+
+<script type="text/javascript">
+	$(function () {
+		$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+			event.preventDefault();
+			$(this).ekkoLightbox({
+				alwaysShowClose: true
+			})
+		});
+
+		//------------вставляем новые выбрвнные из модального окна inputы для Материалов Плана-------------------/
+		$(document).on ( 'click', '#choose-plan', function(){
+			$parent = $('input[name=plan][type=radio]:checked');
+			$( 'input.parentint[type=hidden]' ).val( $parent.val() );
+
+			$('#parent_name').html( $parent.attr("plan-name") );
+
+		});
+
+	});
+</script>
+{% endblock %}
+
+{% block body %}
+	<div class="col-xs-12 center_content">
+		<div class="xs-row">
+			
+			{% set url = path('plan_edit', { 'id':null }) %}
+			{% set returnplan = null %}
+			{% set parentname = 'Назначить' %}
+			{% set notid = null %}
+
+			{% if plan.id is defined %}
+				{% set url = path('plan_edit', { 'id':plan.id })  %}
+				{% set notid = '?notid=' ~ plan.id %}
+
+				{% if plan.parent.name is defined %}
+					{% set parentname = plan.parent.name %}
+				{% endif %}
+				{% set returnplan = '<a class="btn btn-default" href="' ~ path('plan_show', { 'id':plan.id, 'code':plan.code }) ~ '">Отмена</a>' %}
+			{% endif %}
+
+			<div class="block-border">
+				<div class="col-lg-12">
+					<form action="{{url}}" method="POST" role="form" {{ form_enctype(planForm) }}>
+						<!-- Fine Uploader DOM Element	====================================================================== -->
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-xs-3">
+									{{ form_label(planForm.parentint, null, {'label_attr': {'class': 'control-label'}}) }}:
+								</div>
+								<div class="col-xs-9">
+									<a
+										class="anchor" 
+										href="{{ path('plan') }}{{ notid }}"
+										data-toggle="lightbox" 
+										data-gallery="example-plan"
+										data-width="600"
+										data-title='Выбирете Родительский пункт плана'
+										data-footer='<button 
+													type="submit"
+													id="choose-plan" 
+													class="btn btn-danger"
+													data-dismiss="modal"
+													aria-label="Close"
+												>
+													Выбрать
+												</button>'
+									>
+										<span id="parent_name">{{ parentname }}</span>
+									</a>
+									{{ form_widget(planForm.parentint, { 'attr': {'class':'form-control parentint'} }) }}
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.name) %}has-error{% endif %}">
+							{{ form_label(planForm.name, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.name, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(planForm.name) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.name) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.code) %}has-error{% endif %}">
+							{{ form_label(planForm.code, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.code, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(planForm.code) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.code) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="row">
+							<div class="col-xs-10">
+								<div class="form-group {% if form_errors(planForm.type) %}has-error{% endif %}">
+									{{ form_label(planForm.type, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(planForm.type, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(planForm.type) %}
+										<div class="help-block alert alert-danger">{{ form_errors(planForm.type) }}</div>
+									{% endif %}
+								</div>
+							</div>
+
+							<div class="col-xs-2">
+								<div class="form-group {% if form_errors(planForm.sort) %}has-error{% endif %}">
+									{{ form_label(planForm.sort, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(planForm.sort, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(planForm.sort) %}
+										<div class="help-block alert alert-danger">{{ form_errors(planForm.sort) }}</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.image) %}has-error{% endif %}">
+							{{ form_label(planForm.image, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.image, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(planForm.image) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.image) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.preview) %}has-error{% endif %}">
+							{{ form_label(planForm.preview, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.preview, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(planForm.preview) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.preview) }}</div>
+							{% endif %}
+						</div>
+						
+						<div class="form-group {% if form_errors(planForm.content) %}has-error{% endif %}">
+							{{ form_label(planForm.content, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.content, { 'attr': {'class':'form-control'} }) }}
+							{% if form_errors(planForm.content) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.content) }}</div>
+							{% endif %}
+						</div>
+						
+						<div class="form-group {% if form_errors(planForm.plus) %}has-error{% endif %}">
+							{{ form_label(planForm.plus, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.plus, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список плюсов данного плана, пукты вводится через точку с запятой(;) без перносов и пробелов</div>
+							{% if form_errors(planForm.plus) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.plus) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.minus) %}has-error{% endif %}">
+							{{ form_label(planForm.minus, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.minus, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список минусов данного плана, пукты вводится через точку с запятой(;) без перносов и пробелов</div>
+							{% if form_errors(planForm.minus) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.minus) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.externallinks) %}has-error{% endif %}">
+							{{ form_label(planForm.externallinks, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.externallinks, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список ссылок на статьи на этот план, Сначало ссылка а потом карсная строка("	"), пукты вводится через точку с запятой(;) без перносов и пробелов пример "ya.ru	Яндекс;google.com	Гоогл;"</div>
+							{% if form_errors(planForm.externallinks) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.externallinks) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="form-group {% if form_errors(planForm.videolinks) %}has-error{% endif %}">
+							{{ form_label(planForm.videolinks, null, {'label_attr': {'class': 'control-label'}}) }}:
+							{{ form_widget(planForm.videolinks, { 'attr': {'class':'form-control'} }) }}
+							<div class="help-block">Список ссылок на видео для этого плана, пукты вводится через точку с запятой(;) без перносов и пробелов пример "ya.ru	Яндекс;google.com	Гоогл;"</div>
+							{% if form_errors(planForm.videolinks) %}
+								<div class="help-block alert alert-danger">{{ form_errors(planForm.videolinks) }}</div>
+							{% endif %}
+						</div>
+
+						<div class="col-xs-4">
+							<div class="form-group {% if form_errors(planForm.pricematerial) %}has-error{% endif %}">
+								<div class="form-group {% if form_errors(planForm.pricematerial) %}has-error{% endif %}">
+									{{ form_label(planForm.pricematerial, null, {'label_attr': {'class': 'control-label'}}) }}:
+									{{ form_widget(planForm.pricematerial, { 'attr': {'class':'form-control'} }) }}
+									{% if form_errors(planForm.pricematerial) %}
+										<div class="help-block alert alert-danger">{{ form_errors(planForm.pricematerial) }}</div>
+									{% endif %}
+								</div>
+							</div>
+
+							<div class="form-group {% if form_errors(planForm.pricematerialmeasure) %}has-error{% endif %}">
+								{{ form_label(planForm.pricematerialmeasure, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(planForm.pricematerialmeasure, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(planForm.pricematerialmeasure) %}
+									<div class="help-block alert alert-danger">{{ form_errors(planForm.pricematerialmeasure) }}</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="col-xs-4">
+							<div class="form-group {% if form_errors(planForm.priceworck) %}has-error{% endif %}">
+								{{ form_label(planForm.priceworck, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(planForm.priceworck, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(planForm.priceworck) %}
+									<div class="help-block alert alert-danger">{{ form_errors(planForm.priceworck) }}</div>
+								{% endif %}
+							</div>
+
+							<div class="form-group {% if form_errors(planForm.priceworckmeasure) %}has-error{% endif %}">
+								{{ form_label(planForm.priceworckmeasure, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(planForm.priceworckmeasure, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(planForm.priceworckmeasure) %}
+									<div class="help-block alert alert-danger">{{ form_errors(planForm.priceworckmeasure) }}</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="col-xs-4">
+							<div class="form-group {% if form_errors(planForm.complexity) %}has-error{% endif %}">
+								{{ form_label(planForm.complexity, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(planForm.complexity, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(planForm.complexity) %}
+									<div class="help-block alert alert-danger">{{ form_errors(planForm.complexity) }}</div>
+								{% endif %}
+							</div>
+
+							<div class="form-group {% if form_errors(planForm.worcktime) %}has-error{% endif %}">
+								{{ form_label(planForm.worcktime, null, {'label_attr': {'class': 'control-label'}}) }}:
+								{{ form_widget(planForm.worcktime, { 'attr': {'class':'form-control'} }) }}
+								{% if form_errors(planForm.worcktime) %}
+									<div class="help-block alert alert-danger">{{ form_errors(planForm.worcktime) }}</div>
+								{% endif %}
+							</div>
+						</div>
+
+
+						{# form_widget(planForm, {'attr': {'class': 'form-group'}}) #}
+						{# form_errors(planForm) #}
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-danger">Сохранить</button>
+							{{ returnplan| raw }}
+
+							{% if plan.id is defined %}
+								<a 
+									class="btn_link icin_btn atcaption" 
+									onclick="if( !confirm('Уверены, что хотите удалить пункт {{plan.name}}?') ) return false;"
+									href="{{ path('plan_delete', { 'id':plan.id }) }}"
+								>
+									<span class="glyphicon glyphicon-remove"></span> Удалить
+								</a>
+							{% endif %}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+{% block javascriptSlide %}{% endblock javascriptSlide %}

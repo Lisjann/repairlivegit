@@ -1,0 +1,25 @@
+{# src/top10/CabinetBundle/Resources/views/Home/homesroomsmenu.html.twig #}
+
+{% if homesRoomsMenu|length > 0 %}
+	<h3 class="red_line">Наш дом</h3>
+	<div class="block homes-rooms-menu panel-body">
+		<ul class="nav nav-pills nav nav-stacked">
+		{% for home in homesRoomsMenu %}
+			<li>
+				<a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}" itemprop="name">{% if home.homestype|length > 0  %} {{ home.homestype.name }}. {% endif %} {{home.name}}</a>
+				{% if home.rooms|length > 0 %}
+					<ul class="nav nav-pills nav nav-stacked">
+						{% for room in home.rooms %}
+							{% if room.approved == 1 %}
+								<li>
+									<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}" itemprop="name">{% if room.roomstype|length > 0  %} {{ room.roomstype.name }}. {% endif %} {{room.name}}</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				{% endif %}
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+{% endif %}

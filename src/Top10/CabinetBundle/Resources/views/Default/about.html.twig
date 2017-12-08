@@ -1,0 +1,50 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+	<div class="col-lg-12 aboutcpt" style="margin-right: -15px;">
+		<div class="xs-row">
+			<div class="bg_menu_cpt">
+				<div class="black_line">
+					<h1>О сообществе</h1>
+					<span>Немного о нас, о том что мы делаем и зачем нам все это нужно.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			<div class="about block-border">
+				<div class="col-lg-12">
+					<!--img src="/bundles/cabinet/images/about1.jpg" alt=""/-->
+					<img src="/bundles/cabinet/images/about3.jpg" alt=""/>
+
+					<p>Вы так долго ждали его, планировали какой он будет, где будет в нем детская, кухня, а где гостиная, а может вы вообще думали о большой открытой студии. Много раз представляли, как первый раз переступаете его порог.</p>
+
+					<p>И вот наконец он у вас появился – ваш Дом. Будь то уютное гнездышко, где по вечерам вместе собирается вся семья, или же наоборот крутая берлога, где постоянно много друзей и вечеринок.
+
+					<p>Какой бы он не был, он ваш Дом – место, где мы проводим большую часть своей жизни, то что ассоциируется с нами больше всего, и то куда мы хотим вернуться, несмотря ни на что.
+
+					<p>Так почему бы не рассказать всем о том, что характеризует вас, как ни что другое – о своем Доме. И мы создатели этого ресурса даем вам такую возможность. Вы можете сделать ваш Дом предметом гордости показав его другим людям, которые любят свой дом не меньше чем вы свой.</p>
+
+					<p>Для этого вам всего лишь нужно пройти простую регистрацию <a class="btn_link icin_btn" href="{{ path('fos_user_registration_register') }}"><span class="glyphicon glyphicon-check"></span> Регистрация</a> и создать страницу вашего Дома <a class="btn_link icin_btn" href="{{ path('home_add') }}"><span class="glyphicon glyphicon-plus"></span> Добавить Дом</a> с парой картинок и небольшим описанием. Также вы можете вести <a href="{{ path('room_show', { 'id':'1', 'code':'kukhnia-v-smeshannom-stile-eclektiki', 'order[date]':'DESC' }) }}#postslist" target="_blanck">Домовой журнал</a> рассказывая о прелестях, случившихся с ним за последнее время.</p>
+
+					<p>Мы всегда ждем вас на нашем сайте и всегда рады вашему неповторимому и уникальному жилищу. Нам очень интересно, то что в нем происходит! С уважением к вам и вашему Дому создатели <strong>Ремон Live.</strong></p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+
+{% block right_content %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+{% endblock right_content %}
+
+
+
+{% block javascriptSlide %}
+{% endblock javascriptSlide %}

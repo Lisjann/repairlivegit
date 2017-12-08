@@ -1,0 +1,25 @@
+/*.mce-content-body{margin-left:120px;}*/
+body{padding: 10px!important;}
+
+.mce-content-body h1, .mce-content-body h2, .mce-content-body h3 
+{
+display: block!important;
+margin-top: 0!important;
+margin-bottom: 25px!important;
+color: #2a2323!important;
+font-family: Cambria!important;
+font-weight: normal!important;
+}
+
+.mce-content-body h2{font-size: 24px!important;}
+
+.mce-content-body p
+{
+font-size: 16px;
+background-repeat: repeat;
+color: #626262;
+font-family: 'Open Sans', Verdana, Tahoma, sans-serif;
+margin-top: 0!important;
+margin-bottom: 25px!important;
+line-height: 24px;
+}

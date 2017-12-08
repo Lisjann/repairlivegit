@@ -1,0 +1,419 @@
+{% extends '::base.html.twig' %} 
+
+{% block title %}{% if post.title != '' %}{{post.title}}{% else %}{{post.name}} - РемонтLive{% endif %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+{% block description %}{% endblock %}
+
+{% block seo %}
+	<meta name="robots" content="noindex,nofollow" />
+{% endblock %}
+
+{#% block jquery %}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/lib/jquery-1.8.3.min.js') }}"></script>
+{% endblock %#}
+
+{% block javascript %}
+{# TinyMCE #}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/tinymce/js/tinymce/tinymce.js') }}"></script>
+	<script type="text/javascript">
+tinymce.init({
+  verify_html : false,
+  selector: 'textarea#form_content',
+  language:'ru',
+  /*width: 790,*/
+  //height: 400,
+  autoresize_min_height: 400,
+  fixed_toolbar_container: '#mytoolbar',
+  plugins: [
+    "fixedtoolbar autoresize advlist stylebuttons autolink autosave cite link imagedesc lists charmap preview hr pagebreak spellchecker",
+    "searchreplace wordcount visualblocks code fullscreen insertdatetime media",
+    "table contextmenu directionality emoticons textcolor paste textcolor colorpicker textpattern"
+  ],
+
+  toolbar1: "bold italic | style-p style-h2 | {% if is_granted('ROLE_ADMIN') %}cite blockquote q |{% endif %} bullist numlist | link unlink | image media | underline strikethrough superscript charmap | visualblocks {% if is_granted('ROLE_ADMIN') %}code{% endif %}",
+  
+  menubar: false,
+  toolbar_items_size: 'medium',
+  fontsize_formats: "14pt",
+  visualblocks_default_state: true,
+
+  style_formats: [{
+    title: 'Bold text',
+    inline: 'b'
+  }, {
+    title: 'Example 1',
+    inline: 'span',
+    classes: 'example1'
+  }, {
+    title: 'Example 2',
+    inline: 'span',
+    classes: 'example2'
+  }, {
+    title: 'Table styles'
+  }, {
+    title: 'Table row 1',
+    selector: 'tr',
+    classes: 'tablerow1'
+  }],
+
+  templates: [{
+    title: 'Test template 1',
+    content: 'Test 1'
+  }, {
+    title: 'Test template 2',
+    content: 'Test 2'
+  }],
+  content_css: [
+    '{{ asset("bundles/cabinet/tinymce/js/tinymce/skins/lightgray/content.post.min.css") }}',
+	'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+    '//www.tinymce.com/css/codepen.min.css'
+  ]
+});
+
+
+
+
+$(function () {
+	$('.tree li:has(ul)').addClass('parent_li').find(' > .toggle_branch').attr('title', 'Свернуть ');
+
+	$('.item').change( function() {
+		if( $(this).prop("checked") )
+			$(this).closest('.branch').find('.panel-heading input.finished').prop("disabled",false );
+		else
+			$(this).closest('.branch').find('.panel-heading input.finished').prop('disabled',true );
+	});
+
+	$('.tree li.parent_li > .branch .toggle_branch').on('click', function (e) {
+		var children = $(this).closest('li.parent_li').find(' > ul > li');
+		if (children.is(":visible")) {
+			children.hide('fast');
+			$(this).attr('title', 'Развернуть').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+		} else {
+			children.show('fast');
+			$(this).attr('title', 'Свернуть').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+		}
+		e.stopPropagation();
+	});
+
+	/*$('.metadata').tooltip();
+	$('.question').popover()
+	
+	$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+		event.preventDefault();
+		$(this).ekkoLightbox();
+	});*/
+});
+
+	</script>
+
+	{% include 'Top10CabinetBundle:Post:fineuploader.html.twig' with { 'type' : 'post' } %}
+
+{% endblock javascript %}
+
+{% block form_post %}
+<form action="{{ path('post_edit', { 'id':post.id }) }}" method="post" {{ form_enctype(postForm) }}>
+{% endblock %}
+
+{% block body %}
+
+	<!--div class="col-sm-1 hidden-xs left_content edit"></div-->
+	<div class="col-sm-9 col-xs-12 left_content edit">
+		<div class="xs-row">
+			<div class="block-border">
+				<div class="col-lg-12">
+					{% if errorValids | length %}
+						{% for errorValid in errorValids %}
+							<p class="errortext">{{ errorValid | raw }}</p>
+						{% endfor %}
+					{% endif %}
+
+					<div class="form-group">
+						{{ form_widget(postForm.name, { 'value': post.name, 'attr': { 'class':'form-control inputname', 'placeholder': 'Название'} }) }}
+					</div>
+
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								{{ form_widget(postForm.created, { 'attr': { 'class':'form-control', 'value': post.created|date('Y-m-d')} }) }}
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<div class="form-group">
+								{% set attr = null %}
+								{% if post.approved == 1 %}
+									{% set attr = {'checked' : 'checked'}%}
+								{% endif %}
+								{{ form_widget(postForm.approved, { 'attr': attr }) }} {{ form_label(postForm.approved, null, {'label_attr': {'class': 'control-label'}}) }}
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						{% if is_granted('ROLE_ADMIN') %}
+							<div class="col-xs-6">
+								<div class="form-group">
+									{% set attr = null %}
+									{% if post.interesting == 1 %}
+										{% set attr = {'checked' : 'checked'}%}
+									{% endif %}
+									{{ form_widget(postForm.interesting, { 'attr': attr }) }} 
+									{{ form_label(postForm.interesting, null, {'label_attr': {'class': 'control-label'}}) }}
+								</div>
+							</div>
+							<div class="col-xs-6">
+								<div class="form-group">
+									{% if post.useful == 1 %}
+										{{ form_widget(postForm.useful, { 'attr': {'checked' : 'checked'} }) }}
+									{% else %}
+										{{ form_widget(postForm.useful) }}
+									{% endif %}
+									{{ form_label(postForm.useful, null, {'label_attr': {'class': 'control-label'}}) }}
+								</div>
+							</div>
+
+							<div class="col-xs-6">
+								<div class="form-group">
+									{% if post.mainBig == 1 %}
+										{{ form_widget(postForm.mainBig, { 'attr': {'checked' : 'checked'} }) }}
+									{% else %}
+										{{ form_widget(postForm.mainBig) }}
+									{% endif %}
+									{{ form_label(postForm.mainBig, null, {'label_attr': {'class': 'control-label'}}) }}
+								</div>
+							</div>
+							<div class="col-xs-6">
+								<div class="form-group">
+									{% if post.mainSmall == 1 %}
+										{{ form_widget(postForm.mainSmall, { 'attr': {'checked' : 'checked'} }) }}
+									{% else %}
+										{{ form_widget(postForm.mainSmall) }}
+									{% endif %}
+									{{ form_label(postForm.mainSmall, null, {'label_attr': {'class': 'control-label'}}) }}
+								</div>
+							</div>
+
+							<div class="col-xs-12">
+								<div class="form-group">
+									{{ form_widget(postForm.title, { 'value': post.title| raw, 'attr': { 'class':'form-control', 'placeholder': 'Титул'} }) }}
+									{% if form_errors(postForm.title) %}
+										<div class="help-block alert alert-danger">{{ form_errors(postForm.title) }}</div>
+									{% endif %}
+								</div>
+							</div>
+							<div class="col-xs-12">
+								<div class="form-group">
+									{{ form_widget(postForm.keywords, { 'value': post.keywords| raw, 'attr': { 'class':'form-control', 'placeholder': 'Ключи'} }) }}
+								</div>
+							</div>
+							<div class="col-xs-12">
+								<div class="form-group">
+									{{ form_widget(postForm.description, { 'value': post.description| raw, 'attr': { 'class':'form-control', 'placeholder': 'Содержание'} }) }}
+								</div>
+							</div>
+						{% endif %}
+					</div>
+
+					{{ form_widget(postForm.image, { 'value': post.image| raw, 'attr': { 'class':'form-control', 'placeholder': 'Картинка'} }) }}
+
+					{#----------Привязкак к комнате---------------- #}
+					<h3>Выбрать Комнаты описанные в этой статье</h3>
+					{% for room in post.homes.rooms %}
+					<div class="panel panel-default">
+					  <!--div class="panel-heading">Комнаты в которых происходит действие</div-->
+						<div class="panel-body properties" style="padding-bottom: 0;">
+								{% set val = null %}
+								{% for roomsposts in room.roomsposts %}
+									{% if roomsposts.rooms.id == room.id and roomsposts.posts.id == post.id %}
+										{% set val = 1 %}
+									{% endif %}
+								{% endfor %}
+								<div class="form-group row">
+									<div class="col-sm-1">
+										<input 
+											type="checkbox" 
+											id="{{'room_' ~ room.id}}" 
+											name="room[]" 
+											value="{{room.id}}"
+											{% if val == 1 %}checked="checked"{% endif %}
+										/>
+									</div>
+									<div class="col-sm-3">
+										{% if room.slides|length > 0 %}
+											<img src="{{ room.slides|first.image|imagine_filter('thumb') }}"/>
+										{% endif %}
+									</div>
+									<label for="form_description" class="col-sm-8 control-label">
+										<a target="_blanck" href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}">
+											{{ room.roomstype.name }}. {{ room.name }}
+										</a>
+									</label>
+								</div>
+								{% set val = null %}
+
+								{#----------План---------------- #}
+								
+								<div class="row" id="accordion">
+									<div class="panel panel-default" style="margin-bottom: 0;">
+										<div class="panel-heading" style="cursor:pointer; border-bottom: 0">
+											<h4 class="panel-title">
+												<span data-toggle="collapse" data-parent="#accordion" href="#collapseOne{{ room.id }}">
+													Выбрать пункты из План-проекта описанные в этой статье
+												</span>
+											</h4>
+										</div>
+										<div id="collapseOne{{ room.id }}" class="collapse">
+											<div class="plan postplan panel-body">
+												{% set planforeginIsset = false %}
+
+												{% if planForeginmeta|length > 0 %}
+												<div class="tree">
+													{% include 'Top10CabinetBundle:Plan:showproperties_post.html.twig' with { 'item' : planForeginmeta } %}
+												</div>
+												{% else %}
+													{% if isWriter %}
+														<p>План-проект пока не создан...</p>
+														<a class="btn_link icin_btn" target="_blanck" href="{{ path( 'plan_add', { 'room_id':room.id }) }}"><span class="glyphicon glyphicon-tasks"></span> Создать План-проект</a>
+													{% else %}
+														<p>План-проект пока не создан...</p>
+													{% endif %}
+												{% endif %}
+											</div>
+										</div>
+									</div>
+								</div>
+								{#----------/План---------------- #}
+						</div>
+					</div>
+					{% endfor %}
+					{#----------/Привязкак к комнате---------------- #}
+
+
+					{% if is_granted('ROLE_ADMIN') %}
+						<div class="form-group">
+							{{ form_widget(postForm.preview, { 'value': post.preview| raw, 'attr': { 'class':'form-control', 'placeholder':'Превью', 'data':'elastic'} }) }}
+						</div>
+					{% endif %}
+
+					<div class="form-group">
+						<div id="mytoolbar"></div>
+						{{ form_widget(postForm.content, { 'value': post.content| raw, 'attr': { 'class':'editor', 'placeholder':'Содержание'} }) }}
+					</div>
+					
+					<div class="form-group {% if form_errors(postForm.preview) %}has-error{% endif %}">
+						<div id="mytoolbar"></div>
+						{{ form_widget(postForm.content, { 'attr': { 'class':'control-label editor'} }) }}
+						<div class="help-block">
+							Чтобы разместить картинку в содержании статьи: 
+							<ul>
+								<li>Добавие изображения в блок для закрузки картинок;</li>
+								<li>После поставте курсор в тексте статьи в то место где хотите вывести картинку;</li>
+								<li>И кликните на нужную вам картинку в блоке для загрузки изображений.</li>
+							</ul>
+							Для отображениея картинки в Дмовом журнале или Ленте выберете Главную картинку в блоке для загрузки изображений
+						</div>
+						{% if form_errors(postForm.content) %}
+							<div class="help-block alert alert-danger">{{ form_errors(postForm.content) }}</div>
+						{% endif %}
+					</div>
+
+					<div class="form-group" style="float: left;margin-top: 10px;">
+						<button type="submit" class="btn btn-danger">Сохранить</button>
+						<a class="btn btn-default" href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}">Отмена</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
+
+
+{% block right_content %}
+	{% include 'Top10CabinetBundle:Tags:indexInput.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+{% endblock right_content %}
+
+
+
+{% block bottom_content %}{% endblock bottom_content %}
+
+
+{% block form_post_end %}
+</form>
+
+ <!-- Fine Uploader DOM Element
+====================================================================== -->
+
+<div id="fine-uploader-gallery-wrap">
+	<div class="slide">свернуть/развернуть</div>
+	<div id="fine-uploader-gallery"></div>
+</div>
+
+{% endblock %}
+
+
+
+{% block javascriptSlide %}
+	 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
+    ====================================================================== -->
+    <script type="text/javascript">
+        var uploader = $('#fine-uploader-gallery').fineUploader({
+            debug: false, //включаем дебаг в консоль браузера. 
+			session : {
+				endpoint : "{{ path( 'post_uploadlist', {'id':post.id} ) }}",
+			},
+			template: 'qq-template-gallery',
+            request: {
+				endpoint: "{{ path( 'post_upload', {'id':post.id} ) }}", //путь к серверной части
+				//forceMultipart: false,
+				inputName: 'qqfiles', //имя инпут поля типа file
+				/*params: {
+					action: 'files' //здесь можно указать доп. параметры, которые надо передать серверной части
+				}*/
+			},
+            thumbnails: {
+                placeholders: {
+                    waitingPath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/waiting-generic.png') }}",
+                    notAvailablePath: "{{ asset('bundles/cabinet/fine-uploader/placeholders/not_available-generic.png') }}"
+                }
+            },
+			
+            resume: {
+                enabled: false
+			},
+			deleteFile: {
+                enabled: true,
+                method: "POST",
+                endpoint: "{{ path( 'post_upload', {'id':post.id} ) }}"
+            },
+			validation: {
+                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+				sizeLimit: 6000000, //максимальный размер файла для первого уровня проверки
+				itemLimit: 40 //максимальное количество файлов для текущего подключения плагина
+            },
+			/*dragAndDrop: {
+				disableDefaultDropzone: true //отключаем дроп-зону
+			},*/
+			messages: { //русифицируем некоторые сообщения и кнопки
+				typeError: "{file}: неверный тип файла. Принимаются только файлы форматов: {extensions}.",
+				sizeError: "{file}: файл слишком большой. Максимальный размер: {sizeLimit}.",
+				tooManyItemsError: "Вы пытаетесь закачать {netItems}-й файл. Максимальное количество: {itemLimit}."
+			},
+			text: {
+				fileInputTitle: 'Добавить изображение',
+				uploadButton: 'Прикрепить файлы',
+				failUpload: 'Не закачан!'
+			}
+        });
+
+//------------ПРИСВАЕВАЕМ ЗНАЧЕНИЕ РАДИОБАТОНА ГЛАВНОЙ КАРТИНКЕ В ПОЛЕ uploader ЗНАЧЕНИЮ ИНПУТА ГЛАВНОЙ КАРТИНКЕ В ФОРМЕ ПОСТА-----------------
+		$(document).ready(function () {
+			$('#fine-uploader-gallery').on('change', 'ul.qq-upload-list-selector li.qq-upload-success input.qq-edit-mainfile-selector', function(){
+				$('input#form_image').val( $(this).val() );
+			});
+
+			$("#fine-uploader-gallery-wrap .slide").click(function () {
+				$("#fine-uploader-gallery").slideToggle("slow");
+			});
+		})
+    </script>
+{% endblock %}

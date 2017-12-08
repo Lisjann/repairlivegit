@@ -1,0 +1,112 @@
+/*body{padding: 10px 0 10px 120px!important;}*/
+body{padding: 10px!important;}
+
+/*.mce-content-body{margin-left:120px;}*/
+
+.mce-content-body h1, .mce-content-body h2, .mce-content-body h3 
+{
+display: block!important;
+margin-top: 0!important;
+margin-bottom: 25px!important;
+color: #2a2323!important;
+font-family: Cambria!important;
+font-weight: normal!important;
+}
+
+.mce-content-body h2{font-size: 24px!important;}
+
+.mce-content-body p
+{
+/*width:660px;*/
+font-size: 16px;
+background-repeat: repeat;
+color: #626262;
+font-family: 'Open Sans', Verdana, Tahoma, sans-serif;
+margin-top: 0!important;
+margin-bottom: 25px!important;
+line-height: 24px;
+}
+
+.mce-content-body p q {display:block;} 
+
+.mce-content-body blockquote:before, .mce-content-body p  q:before
+{
+position: absolute;
+top: 10px;
+left: 0;
+font-size: 50px;
+border: 5px solid #626262;
+color: #626262;
+text-align: center;
+padding: 0 10px;
+border-radius: 20px;
+cursor:default;
+font-style:normal;
+line-height: normal;
+}
+.mce-content-body blockquote:before{content: "i";}
+.mce-content-body p q:before
+{
+content: "?";
+padding: 0 5px;
+}
+
+
+
+.mce-content-body blockquote  p, .mce-content-body p q
+{
+/*border-top: 1px solid #2a2323;
+border-bottom: 1px solid #2a2323;*/
+font-style: italic;
+padding: 0;
+min-height: 70px;
+}
+.mce-content-body .quote, .mce-content-body q, .mce-content-body p q, .mce-content-body blockquote
+{
+padding-left: 65px;
+margin-bottom: 25px;
+}
+.mce-content-body .img , .mce-content-body .quote, .mce-content-body q, .mce-content-body blockquote {position: relative;}
+.mce-content-body .img{margin-bottom: 25px;}
+.mce-content-body .img img{margin-bottom: 0;}
+
+.mce-content-body .img
+{
+display:block;
+position:relative;
+}
+.mce-content-body .img p 
+{
+/*position: absolute;
+width: 115px;
+top: 0;
+left: -115px;*/
+font-size: 11px;
+font-weight: bold;
+line-height: 20px;
+-moz-hyphens: auto;
+-webkit-hyphens: auto;
+-ms-hyphens: auto;
+}
+
+.mce-content-body .quote span, .mce-content-body blockquote  cite, .mce-content-body .quote cite
+{
+position: absolute;
+font-size: 13px;
+font-weight: bold;
+top: 5px;
+left: 0;
+/*text-align: center;
+padding: 0 10px;*/
+font-style: normal;
+width: 60px;
+}
+
+.mce-content-body blockquote  cite a, .mce-content-body .quote cite a{font-weight: bold;}
+
+.mce-content-body .quote p
+{
+font-style: italic;
+border-bottom: 1px solid #2a2323;
+padding: 0 0 10px 0;
+}

@@ -1,0 +1,228 @@
+{% extends '::basenoright.html.twig' %} 
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}{{home.name}} - РемонтLive{% endblock %}
+
+{% block keywords %}{{home.keywords}}{% endblock %}
+{% block description %}{{home.description}}{% endblock %}
+
+{% block javascript %}
+	<script type="text/javascript">
+		$(function() {
+			$('.response_click').click( function(){
+				$("div.response_area").empty();
+				var $response_click = $(this);
+				$.ajax({
+					cache: false,
+					//url: '/app_dev.php/commentresponse/home_show/{{home.id}}/{{home.code}}/' + $response_click.attr("data-parent") ,
+					url: '/commentresponse/home_show/{{home.id}}/{{home.code}}/' + $response_click.attr("data-parent") ,
+					success: function(html){
+						$response_click.closest(".comment").find('.response_area').html(html);
+					}
+				});
+			});
+
+	{% if likesClass.enabled == likesClass.live %}
+
+			var i = 0;
+			if( i == 0 ){
+				$('.{{likesClass.enabled}}').click( function() {
+					var $likes_click = $(this);
+					$.ajax({
+						cache: false,
+						//url: '/app_dev.php/like/homes/{{home.id}}',
+						url: '/like/homes/{{home.id}}',
+						success: function(html){
+							$likes_click.find('.likes_count').html(html);
+							$likes_click.attr('class', '{{likesClass.disabled}}');
+							i++;
+						}
+					});
+				});
+			}
+
+	{% endif %}
+		});
+	</script>
+{% endblock %}
+
+{% block slides_block %}
+	{% if home.slides | length > 0 %}
+		<div id="carousel-example-generic" class="carousel slide {% if home.approved == 0 %}notapproved{% endif %}" data-ride="carousel">
+			<!-- Indicators -->
+			{% if home.slides | length > 1 %}
+				<ol class="carousel-indicators">
+					{% set i = 0 %}
+					{% for slide in home.slides %}
+						<li data-target="#carousel-example-generic" data-slide-to="{{ i }}" {% if i == 0 %}class="active"{% endif %}></li>
+						{% set i = i + 1 %}
+					{% endfor %}
+				</ol>
+			{% endif %}
+
+			<!-- Wrapper for slides -->
+			<div class="carousel-inner">
+				{% set i = 0 %}
+				{% for slide in home.slides %}
+					<div class="item {% if i == 0 %}active{% endif %}">
+						<img src="{{ slide.image }}" alt="{{slide.description}}"/>
+						{% if slide.description %}
+							<div class="carousel-caption hidden-xs">
+								{{slide.description | raw }}
+							</div>
+						{% endif %}
+					</div>
+					{% set i = i + 1 %}
+				{% endfor %}
+			</div>
+			{% if home.slides | length > 1 %}
+				<!-- Controls -->
+				<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a>
+				<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+					<span class="glyphicon glyphicon-chevron-right"></span>
+				</a>
+			{% endif %}
+		</div>
+	{% endif %}
+{% endblock slides_block %}
+
+{% block body %}
+	<div class="col-sm-12 center_content">
+		<div class="xs-row">
+			<div class="home block-border {% if home.approved == 0 %}notapproved{% endif %}">
+				<div class="col-xs-12">
+					{% if isWriter %}
+						<div class="col-xs-12">
+							<div class="row">
+								<a class="btn_link icin_btn" href="{{ path('home_edit', { 'id':home.id }) }}"><span class="glyphicon glyphicon-pencil"></span> Изменить.</a>
+								<a class="btn_link icin_btn" href="{{ path('room_add', { 'home_id':home.id }) }}"><span class="glyphicon glyphicon-plus"></span> Добавить комнату</a>
+								<a class="btn_link icin_btn" target="_blanck" href="{{ path('post_add', { 'home_id':home.id }) }}"><span class="glyphicon glyphicon-book"></span> Написать пост</a>
+								<a class="btn_link icin_btn"
+								   onclick="if( !confirm('Уверены, что хотите удалить Дом?') ) return false;" 
+								   href="{{ path('home_delete', { 'id':home.id }) }}">
+										<span class="glyphicon glyphicon-remove"></span> Удалить
+								</a>
+							</div>
+						</div>
+					{% endif %}
+
+					<table class="meta">
+						<tr>
+							<td class="date">
+								<time datetime="{{home.created|date('Y-m-d')}}">{{home.created|date('d.m.Y')}}</time>
+							</td>
+							<td class="author">
+								<a href="{{ path('user_show', {'username': home.author.username }) }}">{{home.author.username}}</a>
+							</td>
+							<td class="comment_count">
+								<a href="#comments">
+									{% if commentsCount > 0 %}
+										<span>{{ commentsCount }}</span> <span class="hidden-xs">комментария</span>
+									{% else %}
+										<span class="hidden-xs">комментировать...</span> <span class="visible-xs">...</span>
+									{% endif %}
+								</a>
+							</td>
+
+						</tr>
+					</table>
+
+					{{ home.preview | raw }}
+
+					<h2>Характеристики</h2>
+					<p class="preview" >
+						{% if home.propertiesforegin.count %}
+							<ul class="list-unstyled">
+							{% for propertiesforegin in home.propertiesforegin %}
+								<li>{{ propertiesforegin.properties.name ~ ': ' }}<strong>{{ propertiesforegin.value }}</strong> {{ propertiesforegin.properties.measure }}</li>
+							{% endfor %}
+							</ul>
+						{% endif %}
+
+						{{ home.characteristics | raw }}
+					</p>
+
+					{% include 'Top10CabinetBundle:Default:social_share.html.twig' with { 'likesCount' : likesCount } %}
+				</div>
+			</div>
+
+			<h3 class="red_line">Комнаты</h3>
+
+			{% include 'Top10CabinetBundle:Room:roomslisthome.html.twig' with { 'rooms' : rooms } %}
+
+			{% if posts.count %}
+				<h3 class="red_line">Домовой журнал<a name="postslist"></a></h3>
+
+				<div class="posts {% if home.approved == 0 %}notapproved{% endif %}">
+					{% if posts.count > 1 %}
+						<table class="post_info order">
+							<tr>
+								<td class="order asc">
+									<span>сначала:</span>
+								</td>
+								{% if is_granted('ROLE_ADMIN') %}
+										<td class="order asc">
+											<a 
+												{% if app.request.get('order').approved is defined and app.request.get('order').approved == 'ASC' %}class="change"{% endif %} 
+												href="{{ path( 'home_show', { 'id':home.id, 'code':home.code, 'order[approved]':'ASC' } ) }}#postslist"
+											>
+												неопубликованные
+											</a>
+										</td>
+									{% endif %}
+								<td class="order desc">
+									<a 
+										{% if app.request.get('order').date is defined and app.request.get('order').date == 'DESC' or app.request.get('order') is empty %}class="change"{% endif %}
+										href="{{ path( 'home_show', { 'id':home.id, 'code':home.code, 'order[date]':'DESC' }) }}#postslist"
+									>
+										свежие
+									</a>
+								</td>
+								<td class="order desc">
+									<a
+										{% if app.request.get('order').date is defined and app.request.get('order').date == 'ASC' %}class="change"{% endif %}
+										href=" {{ path( 'home_show', { 'id':home.id, 'code':home.code, 'order[date]':'ASC' }) }}#postslist"
+									>
+										старые
+									</a>
+								</td>
+								<td class="order asc">
+									<a 
+										{% if app.request.get('order').pop is defined and app.request.get('order').pop == 'DESC' %}class="change"{% endif %} 
+										href="{{ path( 'home_show', { 'id':home.id, 'code':home.code, 'order[pop]':'DESC' }) }}#postslist"
+									>
+										популярные
+									</a>
+								</td>
+							</tr>
+						</table>
+					{% endif %}
+
+					{% include 'Top10CabinetBundle:Post:postslist.html.twig' with { 'posts' : posts } %}
+				</div>
+
+				{% if posts.count > 1 or app.request.get('page') %}
+					{# display navigation #}
+					{{ knp_pagination_render(posts, null, {}, {'alignment': 'right'}) }}
+				{% endif %}
+
+			{% else %}
+				<p>Напишите пост о вашей комнате и он появиться в этом блоке</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock body %}
+
+{% block bottom_content %}
+	{% if home.approved == 1 %}
+		{% set path_form = path( 'home_show', { 'id':home.id, 'code':home.code } ) %}
+		{% include 'Top10CabinetBundle:Comments:comment.html.twig' with { 'path_form' : path_form } %}
+	{% endif %}
+{% endblock bottom_content %}
+
+{% block javascriptSlide %}
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/ItemTransitions/classie.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/cabinet/js/ItemTransitions/main.js') }}"></script>
+{% endblock javascriptSlide %}

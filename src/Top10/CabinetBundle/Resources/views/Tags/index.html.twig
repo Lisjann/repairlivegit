@@ -1,0 +1,8 @@
+{# src/top10/CabinetBundle/Resources/views/Tags/index.html.twig #}
+
+<h3 class="red_line">Популярные теги</h3>
+<div class="block block-border tag panel-body">
+	{% for tagspop in tags %}
+		<p><a {% if tagspost and tagspost.id == tagspop.id %} class="active" {%endif%} href="{{ path( 'post_tag', {'tag_code':tagspop.code} ) }}">{{ tagspop.name }}</a></p>
+	{% endfor %}
+</div>

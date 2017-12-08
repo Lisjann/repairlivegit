@@ -1,0 +1,82 @@
+{# src/top10/CabinetBundle/Resources/views/Author/leftcontent.html.twig #}
+{% set user = app.security.getToken().getUser() %}
+<div class="col-md-10 col-md-offset-2">
+	<div class="row">
+		<h3>Мое</h3>
+		{% if user == 'anon.' %}
+		<ul class="nav nav-pills nav">
+			<li><a class="btn_link icin_btn" href="{{ path('fos_user_security_login') }}"><span class="glyphicon glyphicon-user"></span> Войти</a></li>
+			<li><a class="btn_link icin_btn" href="{{ path('fos_user_registration_register') }}"><span class="glyphicon glyphicon-check"></span> Регистрация</a></li>
+		</ul>
+		{% endif %}
+
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<ul class="nav nav-pills nav nav-stacked homes-rooms-menu">
+			<li>
+				<a href="{{ path( 'fos_user_profile_show' ) }}">
+					&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;
+					<span>Профиль</span>
+				</a>
+			</li>
+
+			{% for home in homesRoomsMenu %}
+				<li>
+					<a href="{{ path('home_show', { 'id':home.id, 'code':home.code }) }}" itemprop="name">
+						&nbsp;<span class="glyphicon glyphicon-home"></span>&nbsp;
+						<span>
+							{% if home.homestype|length > 0  %} {{ home.homestype.name }} {% endif %}
+						</span>
+					</a>
+					<ul class="nav nav-pills nav nav-stacked">
+						{% for room in home.rooms %}
+							{% if room.id is defined and room.approved == 1 %}
+								<li>
+									<a href="{{ path('room_show', { 'id':room.id, 'code':room.code }) }}" itemprop="name">
+										&nbsp;<span class="glyphicon glyphicon-bed"></span>&nbsp;
+										<span>{% if room.roomstype is defined  %} {{ room.roomstype.name }} {% endif %}</span>
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+						{#<!--li>
+							<a href="{{ path('room_add', { 'home_id':home.id }) }}" itemprop="name">
+								&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
+								<span>Добавить комнату</span>
+							</a>
+						</li-->#}
+					</ul>
+				</li>
+			{% endfor %}
+
+			{#<!--li>
+				<a href="{{ path('home_add') }}" itemprop="name">
+					&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
+					<span>Добавить Дом</span>
+				</a>
+			</li-->#}
+			<li>
+				<a href="{{ path('fos_user_security_logout') }}" itemprop="name">
+					&nbsp;<span class="glyphicon glyphicon-log-out"></span>&nbsp;
+					<span>{{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</span>
+				</a>
+			</li>
+		</ul>
+		{% endif %}
+
+		<h3>Списки</h3>
+		<ul class="nav nav-pills nav nav-stacked homes-rooms-menu">
+			<li>
+				<a href="{{ path('plan') }}" itemprop="name">
+					&nbsp;<span class="glyphicon glyphicon-tasks"></span>&nbsp;
+					<span>Работы</span>
+				</a>
+			</li>
+			<li>
+				<a href="{{ path('material') }}" itemprop="name">
+					&nbsp;<span class="glyphicon glyphicon-tasks"></span>&nbsp;
+					<span>Стройматериалы</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>

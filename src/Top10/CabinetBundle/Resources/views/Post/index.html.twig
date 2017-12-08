@@ -1,0 +1,149 @@
+{% extends '::base.html.twig' %}
+
+{% set user = app.security.getToken().getUser() %}
+{% set arrRequest = app.request.get('p') %}
+
+{% block title %}РемонтLife Статьи{% endblock %}
+
+{% block body %}
+	<div class="col-sm-9 col-xs-12 center_content">
+		<div class="xs-row">
+			{% if pagination.count %}
+				<div class="posts">
+					{% if tagspost %} 
+						<div class="row">
+							<h3 class="red_line">{{ tagspost.name }}</h3>
+						</div>
+					{%endif%}
+
+					<table class="post_info order">
+						<tr>
+							<td class="order asc">
+								<span>сначала:</span>
+							</td>
+							{% if is_granted('ROLE_ADMIN') %}
+								<td class="order asc">
+									<a 
+										{% if app.request.get('order').approved is defined and app.request.get('order').approved == 'ASC' %}class="change"{% endif %} 
+										href="{{ path('post', { 'order[approved]':'ASC' }) }}"
+									>
+										неопубликованные
+									</a>
+								</td>
+							{% endif %}
+							<td class="order desc">
+								<a 
+									{% if app.request.get('order').date is defined and app.request.get('order').date == 'DESC' or app.request.get('order') is empty %}class="change"{% endif %}
+									href=" {{ path('post', { 'order[date]':'DESC' }) }}"
+								>
+									свежие
+								</a>
+							</td>
+							<td class="order desc">
+								<a 
+									{% if app.request.get('order').date is defined and app.request.get('order').date == 'ASC' %}class="change"{% endif %}
+									href=" {{ path('post', { 'order[date]':'ASC' }) }}"
+								>
+									старые
+								</a>
+							</td>
+							<td class="order asc">
+								<a 
+									{% if app.request.get('order').pop is defined and app.request.get('order').pop == 'DESC' %}class="change"{% endif %} 
+									href="{{ path('post', { 'order[pop]':'DESC' }) }}"
+								>
+									популярные
+								</a>
+							</td>
+						</tr>
+					</table>
+
+					{% for post in pagination %}
+						<div class="post block-border {% if post.approved == 0 %}notapproved{% endif %}" itemscope itemtype="http://schema.org/Article">
+							<div class="col-xs-12">
+								{% if post.image %}
+									<div class="xs-row-top-left-right">
+										<a href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}">
+											<img itemprop="image" src="{{ post.image }}"  alt="" />
+										</a>
+									</div>
+								{% else %}
+									&nbsp;
+								{% endif %}
+
+								<h2><a href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}" itemprop="name">{{post.name}}</a></h2>
+
+								<table class="meta">
+									<tr>
+										<td class="date"><time itemprop="dateCreated" datetime="{{post.created|date('Y-m-d')}}">{{post.created|date('d.m.Y')}}</time></td>
+										<td class="author"><a href="{{ path('user_show', {'username': post.author.username }) }}" itemprop="author">{{post.author.username}}</a></td>
+										<td class="likes">
+											<div class="likes_icon">
+												<span class="glyphicon glyphicon-heart"></span>
+											</div>
+											<div class="likes_count">{{ post.likes|length }}</div>
+										</td>
+										<td class="comment_count">
+											<a href="{{ path('post_show', { 'id':post.id, 'code':post.code }) }}#comments">
+												{% if post.comments|length > 0 %}
+													<span itemprop="commentCount">{{ post.comments|length }}</span> <span class="hidden-xs">комментария</span>
+												{% else %}
+													<span class="hidden-xs">комментировать...</span> <span class="visible-xs">...</span>
+												{% endif %}
+											</a>
+										</td>
+									</tr>
+									<tr>
+										{% if post.tagsforegin.count %}
+											<td class="tag" colspan="4">
+											{% for tagsforegin in post.tagsforegin %}
+												<a href="{{ path( 'post_tag', {'tag_code':tagsforegin.tags.code} ) }}" itemprop="keywords">{{ tagsforegin.tags.name ~ ';' }}</a>
+											{% endfor %}
+											</td>
+										{% endif %}
+									</tr>
+								</table>
+
+								<p itemprop="description">
+									{{ post.previewFirstWords(40) | raw }}
+									
+								</p>
+								{% include 'Top10CabinetBundle:Default:social_share_list.html.twig' with {
+									'path_edit' : 'post_edit',
+									'path_show' : 'post_show',
+									'object' : post,
+									} 
+								%}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+
+				{# display navigation #}
+				{{ knp_pagination_render(pagination, null, {}, {'alignment': 'right'}) }}
+			{% else %}
+				<p>Ничего не найдено</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock body %}
+
+
+
+
+{% block right_content %}
+	{% include 'FOSUserBundle:Default:social.html.twig' %}
+
+	{% include 'Top10CabinetBundle:Tags:index.html.twig' with { 'tags' : tags , 'tagspost' : tagspost } %}
+{% endblock right_content %}
+
+
+
+{% block javascriptSlide %}
+	<script type="text/javascript" >
+	$('.carousel').carousel({
+		interval: false,
+		wrap: false,
+	})
+	</script>
+{% endblock javascriptSlide %}

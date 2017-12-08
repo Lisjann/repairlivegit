@@ -1,0 +1,8 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% set wrapContent = false %}
+
+{% block fos_user_content %}
+	{% include 'Top10CabinetBundle:Form:login.html.twig' %}
+
+{% endblock fos_user_content %}

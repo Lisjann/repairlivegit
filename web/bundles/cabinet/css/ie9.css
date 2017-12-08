@@ -1,0 +1,10 @@
+/*For IE9*/
+img{border:none;}
+
+.component-fullwidth{display:none;}
+
+.post_main .dark, .post_main_small .dark{background: rgba( 0, 0, 0, 0.5 );}
+
+.post_main .dark:hover, .post_main_small .dark:hover{background: rgba( 0, 0, 0, 0.2 );}
+
+.post_main{ text-decoration:none;}
