@@ -2324,3 +2324,6 @@ display: inline;
 
 .properties select {width: 250px;}
 /*----------------------------bootstrap----------------------------------*/
+
+.panel-title.anchor{ border-bottom: 1px dashed #333; } 
+.panel-title.anchor:hover{ border-bottom: 1px dashed #f03939; }

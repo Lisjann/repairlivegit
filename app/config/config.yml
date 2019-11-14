@@ -77,15 +77,16 @@ liip_imagine:
     web_root: ~ # %kernel.root_dir%/../www
     data_root: %kernel.root_dir%/../www
     filter_sets:
+
+        plan:
+            quality: 100
+            filters:
+                thumbnail: { size: [1100, 850], mode: inset }
         slide:
             quality: 100
             filters:
                 thumbnail: { size: [1200, 700], mode: outbound, allow_upscale : true }
                 background : { size : [1200, 700], position : center, color : '#000000' }
-        plan:
-            quality: 100
-            filters:
-                thumbnail: { size: [1100, 850], mode: inset }
         layout:
             quality: 100
             filters:
@@ -121,14 +122,12 @@ liip_imagine:
                 background : { size : [70, 70], position : center, color : '#000000' }
 
 
-sonata_block:
-    default_contexts: [cms]
-    blocks:
-        sonata.admin.block.admin_list:
-            contexts:   [admin]
-
-        sonata.block.service.text:
-        sonata.block.service.rss:
+#sonata_block:
+#    default_contexts: [cms]
+#    blocks:
+        # enable the SonataAdminBundle block
+#        sonata.admin.block.admin_list:
+#            contexts: [admin]
 
 white_october_breadcrumbs:
     separator:          '›'
@@ -140,7 +139,3 @@ white_october_breadcrumbs:
     locale:             ~ # defaults to null, so the default locale is used
     translation_domain: ~ # defaults to null, so the default domain is used
     viewTemplate:       'WhiteOctoberBreadcrumbsBundle::breadcrumbs-cpt.html.twig'
-
-#cmf_seo:
-#    sitemap:
-#        enabled: true

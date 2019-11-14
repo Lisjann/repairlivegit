@@ -85,9 +85,20 @@ class DefaultController extends Controller
 			'homesRoomsMenu' => $homesRoomsMenu,
 		);
 
-        return $result;
+		return $result;
 
-    }
+	}
+
+	/**
+     * about list.
+     *
+     * @Route("/test", name="test")
+     * @Template("Top10CabinetBundle:Default:test.html.twig")
+     */
+	public function testAction( Request $request )
+	{
+		$result = array();
+	}
 
 	/**
      * about list.

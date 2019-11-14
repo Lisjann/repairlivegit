@@ -90,10 +90,6 @@ class ComposerStaticInit501153b77ec81f09af2b6f4c9fa857d6
             array (
                 0 => __DIR__ . '/..' . '/sonata-project/admin-bundle',
             ),
-			'Sonata\\CoreBundle' => 
-            array (
-                0 => __DIR__ . '/..' . '/sonata-project/core-bundle',
-            ),
             'SessionHandlerInterface' => 
             array (
                 0 => __DIR__ . '/..' . '/symfony/symfony/src/Symfony/Component/HttpFoundation/Resources/stubs',

@@ -18,7 +18,6 @@ return array(
     'Sonata\\DoctrineORMAdminBundle' => array($vendorDir . '/sonata-project/doctrine-orm-admin-bundle'),
     'Sonata\\BlockBundle' => array($vendorDir . '/sonata-project/block-bundle'),
     'Sonata\\AdminBundle' => array($vendorDir . '/sonata-project/admin-bundle'),
-    'Sonata\\CoreBundle' => array($vendorDir . '/sonata-project/core-bundle'),
     'SessionHandlerInterface' => array($vendorDir . '/symfony/symfony/src/Symfony/Component/HttpFoundation/Resources/stubs'),
     'Sensio\\Bundle\\GeneratorBundle' => array($vendorDir . '/sensio/generator-bundle'),
     'Sensio\\Bundle\\FrameworkExtraBundle' => array($vendorDir . '/sensio/framework-extra-bundle'),

@@ -8,8 +8,6 @@ Disallow: /reserve
 Disallow: /payment
 Disallow: /cart
 Disallow: /resetting
-Disallow: /edit
-Disallow: /add
 Disallow: /like-comments
 Disallow: /like-posts
 Disallow: /commentresponse

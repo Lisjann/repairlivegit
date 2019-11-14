@@ -42,6 +42,11 @@ services:
         class: Top10\CabinetBundle\Service\TranslateChar
         arguments: [@service_container]
 
+    cabinet.wiki_text_to_html:
+        class: Top10\CabinetBundle\Service\WikiTextToHtml
+        arguments: [@service_container]
+
+
     cabinet.slides_list:
         class: Top10\CabinetBundle\Service\SlidesList
         arguments: [@service_container]

@@ -1,9 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine on
-    
-	#RewriteCond %{SERVER_NAME} qpkolesa\.ru$
+
+    RewriteCond %{SERVER_NAME} qpkolesa\.ru$
     #RewriteRule ^(.*)$ http://cabinet.rimeks-wheels.ru/$1 [L]
-    #RewriteRule ^(.*)$ - [R=404,L,NC]
+    RewriteRule ^(.*)$ - [R=404,L,NC]
 
     #<IfModule mod_vhost_alias.c>
     #    RewriteBase /
@@ -11,25 +11,4 @@
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ app.php [QSA,L]
-    Redirect 301 /post/Hand-made-kitchen-project http://repairlive.ru/post/1/Hand-made-kitchen-project
-    Redirect 301 /post/Hand-made-kitchen-drywall http://repairlive.ru/post/2/Hand-made-kitchen-drywall
-    Redirect 301 /post/Hand-made-kitchen-electrican http://repairlive.ru/post/3/Hand-made-kitchen-electrican
-    Redirect 301 /post/Hand-made-kitchen-wall http://repairlive.ru/post/4/Hand-made-kitchen-wall
-    Redirect 301 /post/Hand-made-kitchen-floor http://repairlive.ru/post/5/Hand-made-kitchen-floor
-    Redirect 301 /post/Hand-made-kitchen-water-pipes http://repairlive.ru/post/6/Hand-made-kitchen-water-pipes
-    Redirect 301 /post/Hand-made-kitchen-brick http://repairlive.ru/post/7/Hand-made-kitchen-brick
-    Redirect 301 /post/do-not-shine-spotlights http://repairlive.ru/post/8/do-not-shine-spotlights
-    Redirect 301 /post/Independent-selection-installation-windows http://repairlive.ru/post/9/Independent-selection-installation-windows
-    Redirect 301 /post/sborka-uglovoi-kukhni-svoimi-rukami http://repairlive.ru/post/10/sborka-uglovoi-kukhni-svoimi-rukami
-    Redirect 301 /post/restavratciia-stola http://repairlive.ru/post/11/restavratciia-stola    
-    Redirect 301 /post/sborka-uglovoi-kukhni-svoimi-rukami-part2 http://repairlive.ru/post/12/sborka-uglovoi-kukhni-svoimi-rukami-part2    
-    Redirect 301 /post/shpaklevka-pokrska-steny http://repairlive.ru/post/13/shpaklevka-pokrska-steny
-    Redirect 301 /post/podokonnik-otkosy http://repairlive.ru/post/14/podokonnik-otkosy
-    Redirect 301 /post/natiazhnoi-potolok-ne-svoimi-rukami http://repairlive.ru/post/15/natiazhnoi-potolok-ne-svoimi-rukami
-    Redirect 301 /post/vysokii-belyi-plintus-svoimi-rukami http://repairlive.ru/post/16/vysokii-belyi-plintus-svoimi-rukami
-    Redirect 301 /post/moldingi-nalichniki-ugolki http://repairlive.ru/post/18/moldingi-nalichniki-ugolki
-    Redirect 301 /post/new-year http://repairlive.ru/post/19/new-year    
-    Redirect 301 /post/domashniaia-kartinnaia-galereia-svoimi-rukami http://repairlive.ru/post/21/domashniaia-kartinnaia-galereia-svoimi-rukami
-    Redirect 301 /post/spalnia-foto-do http://repairlive.ru/post/22/spalnia-foto-do
 </IfModule>
-

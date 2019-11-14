@@ -29,22 +29,10 @@
 								</li>
 							{% endif %}
 						{% endfor %}
-						<li>
-							<a href="{{ path('room_add', { 'home_id':home.id }) }}" itemprop="name">
-								&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
-								<span>Добавить комнату</span>
-							</a>
-						</li>
 					</ul>
 				</li>
 			{% endfor %}
 		{% endif %}
-		<li>
-			<a href="{{ path('home_add') }}" itemprop="name">
-				&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp;
-				<span>Добавить Дом</span>
-			</a>
-		</li>
 		<li>
 			<a href="{{ path('fos_user_security_logout') }}" itemprop="name">
 				&nbsp;<span class="glyphicon glyphicon-log-out"></span>&nbsp;

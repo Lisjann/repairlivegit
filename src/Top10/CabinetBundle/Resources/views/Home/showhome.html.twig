@@ -89,7 +89,7 @@
 {% endblock slides_block %}
 
 {% block body %}
-	<div class="col-sm-12 center_content">
+	<div class="col-xs-12 center_content">
 		<div class="xs-row">
 			<div class="home block-border {% if home.approved == 0 %}notapproved{% endif %}">
 				<div class="col-xs-12">
@@ -153,7 +153,7 @@
 			{% include 'Top10CabinetBundle:Room:roomslisthome.html.twig' with { 'rooms' : rooms } %}
 
 			{% if posts.count %}
-				<h3 class="red_line">Домовой журнал<a name="postslist"></a></h3>
+				<h3 class="red_line">Отчеты<a name="postslist"></a></h3>
 
 				<div class="posts {% if home.approved == 0 %}notapproved{% endif %}">
 					{% if posts.count > 1 %}

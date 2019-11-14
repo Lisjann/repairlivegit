@@ -6,7 +6,7 @@
     },
     "require": {
         "php": ">=5.4",
-        "symfony/symfony": "2.3.*",
+        "symfony/symfony": "2.1.*",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.0.*",
         "twig/extensions": "1.0.*",
@@ -25,9 +25,7 @@
         "phpexcel/phpexcel": "dev-master",
         "liip/imagine-bundle": "dev-master",
         "sonata-project/admin-bundle": "~2.1",
-        "sonata-project/seo-bundle": "^2.2",
-        "sonata-project/doctrine-orm-admin-bundle": "~2.1",
-        "sonata-project/core-bundle": "^3.5"
+        "sonata-project/doctrine-orm-admin-bundle": "~2.1"
     },
     "scripts": {
         "post-install-cmd": [
