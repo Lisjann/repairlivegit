@@ -3,7 +3,7 @@
 /app/bootstrap.php.cache
 /app/cache/*
 /app/config/parameters.yml
-/log
+/log/
 /app/logs/*
 !app/cache/.gitkeep
 !app/logs/.gitkeep
@@ -32,3 +32,4 @@ tests/_output/*
 app/config/parameters.yml.deploy
 app/config/parameters.yml.forum
 /.svn/*
+/log/
